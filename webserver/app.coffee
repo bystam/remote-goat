@@ -1,3 +1,12 @@
-app = require 'express'
+express = require 'express'
+app = express()
 
-console.log(app)
+app.use((require 'morgan')()) # logger
+
+app.get '/', (req, res) ->
+  res.send('Hello HTTP!');
+
+# start server
+port = 5000;
+server = app.listen port, ->
+  console.log "Listening on port: #{port}"
