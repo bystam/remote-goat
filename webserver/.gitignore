@@ -1,3 +1,5 @@
+# node.js / coffeescript
+#--------------------------------------------------------------------
 docs/*.html
 docs/docco
 lib-cov
