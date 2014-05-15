@@ -1,0 +1,23 @@
+{
+  "name": "remote-goat",
+  "version": "0.0.0",
+  "description": "",
+  "main": "app.coffee",
+  "scripts": {
+    "test": "nodeunit test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bystam/remote-goat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bystam/remote-goat/issues"
+  },
+  "homepage": "https://github.com/bystam/remote-goat",
+  "dependencies": {
+    "express": "^4.2.0",
+    "socket.io": "^0.9.16"
+  }
+}
