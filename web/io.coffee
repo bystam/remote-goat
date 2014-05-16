@@ -1,8 +1,7 @@
 SocketIoFileUploader = require 'socketio-file-upload'
 
-exports.setupIoForApp = (app) ->
+exports.setupIo = (app, server) ->
   socketio = require 'socket.io'
-  server = (require 'http').createServer app
 
   app.use SocketIoFileUploader.router
   io = socketio.listen server
@@ -12,7 +11,7 @@ exports.setupIoForApp = (app) ->
 
 setupFileIOForConnection = (socket) ->
   uploader = new SocketIoFileUploader()
-  uploader.dir = '/public/uploads'
+  uploader.dir = './.uploads'
   uploader.listen socket
 
   uploader.on 'saved', (event) ->

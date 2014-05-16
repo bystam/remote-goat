@@ -1,5 +1,6 @@
-exports.appWithJade = ->
+exports.appAndServerWithJade = ->
   express = require 'express'
+  http = (require 'http')
 
   app = express()
         .use express.static(__dirname + '/public')
@@ -7,5 +8,6 @@ exports.appWithJade = ->
         .set 'view engine', 'jade'
         .set 'views', __dirname + '/views'
 
-  return app
+  server = http.createServer app
+  return [app, server]
 

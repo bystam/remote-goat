@@ -4,13 +4,10 @@ html
     link(rel='stylesheet', href='/css/style.css')
 
     script(src='/siofu/client.js')
+    script(src='/socket.io/socket.io.js')
+    script(src='/js/upload.js')
   body
     .box
       input#file_input(type='file')
-      button#my_button Upload file!
+      button#upload_btn Upload file!
       #file_drop Drop files here!
-
-    script
-      instance.listenOnInput(document.getElementById("file_input"))
-      instance.listenOnDrop(document.getElementById("file_drop"))
-      instance.listenOnSubmit(document.getElementById("my_button"), document.getElementById("file_input"))
