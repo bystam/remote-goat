@@ -2,6 +2,15 @@ html
   head
     title = 'lolfi golfi'
     link(rel='stylesheet', href='/css/style.css')
+
+    script(src='/siofu/client.js')
   body
     .box
-      a(href='http://facebook.com/') To facebook!
+      input#file_input(type='file')
+      button#my_button Upload file!
+      #file_drop Drop files here!
+
+    script
+      instance.listenOnInput(document.getElementById("file_input"))
+      instance.listenOnDrop(document.getElementById("file_drop"))
+      instance.listenOnSubmit(document.getElementById("my_button"), document.getElementById("file_input"))

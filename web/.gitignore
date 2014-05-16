@@ -7,3 +7,4 @@ lib/*.js
 node_modules
 README.html
 test/*.js
+*.log
