@@ -1,0 +1,9 @@
+
+.box {
+  display: block;
+  margin: auto;
+  width: 600px;
+  height: 800px;
+  top: 200px;
+  background: yellow;
+}
