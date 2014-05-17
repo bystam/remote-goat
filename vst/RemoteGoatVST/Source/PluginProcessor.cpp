@@ -54,7 +54,8 @@ public:
 		: _processor(processor),
 		_name(name),
 		_bufferIndex(0),
-		_lastModification(0)
+		_lastModification(0),
+		_readyToSwap(false)
 	{
 		memset(_offsets, 0, sizeof(_offsets));
 	}
@@ -96,7 +97,8 @@ public:
 		_readyToSwap = true;
 	}
 
-	// Read <n> samples from frontbuffer into <buffer>.
+	// Read <count> samples from frontbuffer into <output>.
+	// If a new note starts at offset, the sample will play from its start.
 	void read(AudioSampleBuffer& output, int offset, int count, bool isNoteOn)
 	{
 		if (isNoteOn)
@@ -341,21 +343,21 @@ void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBu
 	for (auto& samplePair : _samples)
 	{
 		Sample& sample = samplePair.second;
-		auto it = noteOnSets.find(sample.getName());
-		if (it != noteOnSets.end())
+		auto noteOnSetsIterator = noteOnSets.find(sample.getName());
+		if (noteOnSetsIterator != noteOnSets.end())
 		{
-			std::set<int>& noteOns = it->second;
+			const std::set<int>& noteOns = noteOnSetsIterator->second;
 			int offset = *noteOns.begin();
 			sample.read(buffer, 0, offset, false);
-			for (auto itt = noteOns.begin(); itt != noteOns.end(); ++itt)
+			for (auto noteOnIterator = noteOns.begin(); noteOnIterator != noteOns.end(); ++noteOnIterator)
 			{
-				int noteOn = *itt;
-				auto ittt = itt;
-				++ittt;
-				if (ittt != noteOns.end())
+				int noteOn = *noteOnIterator;
+				auto nextNoteOnIterator = noteOnIterator;
+				++nextNoteOnIterator;
+				if (nextNoteOnIterator != noteOns.end())
 				{
-					int noteOnNext = *ittt;
-					int diff = noteOnNext - noteOn;
+					int nextNoteOn = *nextNoteOnIterator;
+					int diff = nextNoteOn - noteOn;
 					sample.read(buffer, offset, diff, true);
 					offset += diff;
 				}
