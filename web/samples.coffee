@@ -1,20 +1,16 @@
 fs = require 'node-fs'
+multiparty = require 'multiparty'
 
 exports.setupAppForSamples = (app) ->
   app.post '/sample', uploadSample
 
 
 uploadSample = (req, res) ->
-  console.log req.files
-  console.log req.body
-  console.log req.files.file
-  fs.readFile req.files.displayImage.path, (err, data) ->
-    if err
-      return console.log 'file read error #{err}'
+  form = new multiparty.Form()
 
-    newPath = './upload'
-    res.json { status: 'file received' }
-    fs.writeFile newPath, data, (err) ->
-      console.log 'file upload error #{err}'
+  form.parse req, (err, fields, files) ->
+    console.log fields
+
+  res.json { status: 'file received' }
 
 console.log 'app is set up for sample uploading'

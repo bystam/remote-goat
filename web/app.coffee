@@ -4,12 +4,13 @@ exports.appAndServerWithJade = ->
   bodyparser = require 'body-parser'
   midi = require 'midi'
   connect = require 'connect'
+  multer = require 'multer'
 
   app = express()
         .use express.static(__dirname + '/public')
         .use (require 'morgan')() # logger
         .use bodyparser()
-        .use connect.methodOverride()
+        #.use multer({ dest: './uploads'})
         .set 'view engine', 'jade'
         .set 'views', __dirname + '/views'
 
