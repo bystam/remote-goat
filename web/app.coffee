@@ -12,4 +12,3 @@ exports.appAndServerWithJade = ->
 
   server = http.createServer app
   return [app, server]
-
