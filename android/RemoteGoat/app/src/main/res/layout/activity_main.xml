@@ -11,10 +11,11 @@
     tools:context="com.example.remotegoat.app.MainActivity">
 
     <TextView
-        android:text="Hej"
-        android:textSize="50dp"
-        android:fontFamily=""
+        android:gravity="center_horizontal"
+        android:text="@string/waiting"
+        android:textSize="25dp"
         android:id="@+id/instrument_name"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <ImageView
@@ -25,12 +26,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/recordButton"
+        android:textColor="@android:color/white"
         android:text="@string/recordButton"/>
     <com.example.remotegoat.app.MicrophoneSampleView
         android:id="@+id/micSample"
         android:layout_width="fill_parent"
         android:layout_height="200dp"/>
     <Button
+        android:textColor="@android:color/white"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/sendButton"

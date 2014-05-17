@@ -1,7 +1,7 @@
 package com.example.remotegoat.app;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,8 +25,16 @@ public class MainActivity extends Activity {
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
         micSampleView = (MicrophoneSampleView) findViewById(R.id.micSample);
         Typeface font = Typeface.createFromAsset(getAssets(), "8-BIT WONDER.TTF");
+        TextView instrumentTitle = (TextView) findViewById(R.id.instrument_name);
+        instrumentTitle.setTypeface(font);
         Button recordingButton = (Button) findViewById(R.id.recordButton);
+        recordingButton.setBackgroundColor(getResources().getColor(R.color.dark_grey));
         recordingButton.setTypeface(font);
+        int titleId = getResources().getIdentifier("action_bar_title", "id",
+                "android");
+        TextView title = (TextView) findViewById(titleId);
+//        yourTextView.setTextColor(getResources().getColor(R.color.black));
+        title.setTypeface(font);
 
         recordingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,6 +44,7 @@ public class MainActivity extends Activity {
         });
 
         Button sendFileButton = (Button) findViewById(R.id.sendButton);
+        sendFileButton.setBackgroundColor(getResources().getColor(R.color.dark_grey));
         sendFileButton.setTypeface(font);
         sendFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +63,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

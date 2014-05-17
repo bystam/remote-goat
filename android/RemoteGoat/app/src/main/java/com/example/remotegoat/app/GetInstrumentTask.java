@@ -2,9 +2,9 @@ package com.example.remotegoat.app;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,8 +71,8 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(hostname + imagePath, instrumentImage);
         TextView instrumentTitle = (TextView) activity.findViewById(R.id.instrument_name);
-        Typeface font = Typeface.createFromAsset(activity.getAssets(), "8-BIT WONDER.TTF");
-        instrumentTitle.setTypeface(font);
         instrumentTitle.setText(name);
+        View mainView = activity.getWindow().getDecorView();
+        mainView.setBackgroundColor(activity.getResources().getColor(R.color.base_drum));
     }
 }
