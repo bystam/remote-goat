@@ -1,19 +1,16 @@
 fs = require 'node-fs'
+multipart = (require 'connect-multiparty')() # middleware
 
 exports.setupAppForSamples = (app) ->
-  app.post '/sample', uploadSample
+  app.post '/sample', multipart, uploadSample
 
 
 uploadSample = (req, res) ->
   console.log req.body
   console.log req.files
-  fs.readFile req.files.displayImage.path, (err, data) ->
-    if err
-      return console.log 'file read error #{err}'
-
-    newPath = './upload'
-    res.json { status: 'file received' }
-    fs.writeFile newPath, data, (err) ->
-      console.log 'file upload error #{err}'
+  newPath = './upload'
+  res.json { status: 'file received' }
+  fs.writeFile newPath, req.body.file, (err) ->
+    console.log 'file upload error #{err}'
 
 console.log 'app is set up for sample uploading'
