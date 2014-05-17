@@ -20,7 +20,9 @@ class RepaintTimer;
 class Sample;
 class FilesystemTimer;
 
-char* const SAMPLE_NAMES[11] = { "BD", "CB", "CH", "CP", "CY", "HT", "LT", "MT", "OH", "RS", "SD" };
+#define SAMPLE_NAMES_COUNT 11
+char* const SAMPLE_NAMES[SAMPLE_NAMES_COUNT] =
+	{ "BD", "CB", "CH", "CP", "CY", "HT", "LT", "MT", "OH", "RS", "SD" };
 
 //==============================================================================
 /**
@@ -89,9 +91,7 @@ private:
 
 	std::map<String, Sample> _samples;
 	FilesystemTimer* _filesystemTimer;
-	bool _play;
-	int _lastNote;
-	double _frequency;
+	std::map<int, String> _noteNumberSampleNameMap;
 
 private:
     //==============================================================================

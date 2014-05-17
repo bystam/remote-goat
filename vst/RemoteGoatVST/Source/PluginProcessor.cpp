@@ -11,6 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include <map>
+#include <set>
 
 class RepaintTimer : public juce::Timer
 {
@@ -39,6 +40,7 @@ private:
 	int _offsets[2];
 	int _bufferIndex;
 	Time _lastModification;
+	bool _readyToSwap;
 
 public:
 	const char* EXT = ".wav";
@@ -57,9 +59,18 @@ public:
 		memset(_offsets, 0, sizeof(_offsets));
 	}
 
+	const String& getName() const
+	{
+		return _name;
+	}
+
 	// Read <path>/<_name><EXT> and store it in the backbuffer.
 	void update(const String& path, WavAudioFormat& wavAudioFormat)
 	{
+		// Don't load a subsequent sample if a new sample is already loaded (but not yet played).
+		if (_readyToSwap)
+			return;
+
 		// Find audio file.
 		String fileName(path);
 		fileName = File::addTrailingSeparator(fileName);
@@ -82,20 +93,35 @@ public:
 		reader->read(buffer, 0, (int)reader->lengthInSamples, 0, true, false);
 
 		// Done.
-		swap();
+		_readyToSwap = true;
 	}
 
-	// Read <n> samples from frontbuffer into <buffer>. Ish. TODO
-	void read()
+	// Read <n> samples from frontbuffer into <buffer>.
+	void read(AudioSampleBuffer& output, int offset, int count, bool isNoteOn)
 	{
-		// TODO: Check if frontbuffer is empty.
+		if (isNoteOn)
+		{
+			if (_readyToSwap)
+				swap();
+			_offsets[_bufferIndex] = 0;
+		}
+		AudioSampleBuffer* buffer = &(_buffers[_bufferIndex]);
+		if (buffer->getNumChannels() == 0)
+			return;
+		const float* data = buffer->getReadPointer(0);
+		data += _offsets[_bufferIndex];
+		count = std::min(count, (int)(buffer->getNumSamples() - _offsets[_bufferIndex]));
+		output.addFrom(0, offset, data, count);
+		output.addFrom(1, offset, data, count);
+		_offsets[_bufferIndex] += count;
 	}
 
 private:
 	void swap()
 	{
-		_offsets[!_bufferIndex] = 0; // Start from beginning of backbuffer.
-		_bufferIndex = !_bufferIndex; // Swap buffers atomically.
+		int newIndex = !_bufferIndex;
+		_bufferIndex = newIndex; // Swap buffers atomically.
+		_readyToSwap = false;
 	}
 };
 
@@ -148,7 +174,8 @@ RemoteGoatVstAudioProcessor::RemoteGoatVstAudioProcessor()
 
 	_filesystemTimer = new FilesystemTimer(this);
 
-	_play = false; 
+	for (int i = 0; i < SAMPLE_NAMES_COUNT; ++i)
+		_noteNumberSampleNameMap[i] = SAMPLE_NAMES[i];
 }
 
 RemoteGoatVstAudioProcessor::~RemoteGoatVstAudioProcessor()
@@ -281,46 +308,68 @@ void RemoteGoatVstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
 			trace << String::formatted(" %02X", midiMessages.data[i]);
 		}
 		writeTrace(trace);
+	}
 
-		MidiBuffer::Iterator it(midiMessages);
-		MidiMessage midiMessage;
-		int samplePosition;
-		while (it.getNextEvent(midiMessage, samplePosition))
+	// For each sample name,
+	// a sorted collection of "note on" event sample positions.
+	std::map<String, std::set<int>> noteOnSets;
+
+	MidiBuffer::Iterator it(midiMessages);
+	MidiMessage midiMessage;
+	int samplePosition;
+	while (it.getNextEvent(midiMessage, samplePosition))
+	{
+		if (midiMessage.isNoteOn())
 		{
-			if (midiMessage.isNoteOn())
+			// Check note number, map to sample name.
+			// Save note on sample position for sample.
+			int note = midiMessage.getNoteNumber();
+			auto itt = _noteNumberSampleNameMap.find(note);
+			if (itt != _noteNumberSampleNameMap.end())
 			{
-				_play = true;
-				_lastNote = midiMessage.getNoteNumber();
-				_frequency = midiMessage.getMidiNoteInHertz(_lastNote);
-			}
-			else if (midiMessage.isNoteOff()
-				&& midiMessage.getNoteNumber() == _lastNote)
-			{
-				_play = false;
+				String sampleName = itt->second;
+				noteOnSets[sampleName].insert(samplePosition);
 			}
 		}
-
-		midiMessages.clear();
 	}
+
+	midiMessages.clear();
 
 	buffer.clear(0, 0, buffer.getNumSamples());
 	buffer.clear(1, 0, buffer.getNumSamples());
 
-	static long long t = 0;
-	const double pi = std::cos(0) * 2;
-	double sampleRate = this->getSampleRate();
-	float* left = buffer.getWritePointer(0);
-	float* right = buffer.getWritePointer(1);
-	for (int i = 0; i < buffer.getNumSamples(); ++i)
+	for (auto& samplePair : _samples)
 	{
-		//if (_play)
-		//{
-		//	double x = 2 * pi * 1 / (sampleRate / _frequency);
-		//	left[i] = right[i] = sin(x * t);
-		//}
-		++t;
+		Sample& sample = samplePair.second;
+		auto it = noteOnSets.find(sample.getName());
+		if (it != noteOnSets.end())
+		{
+			std::set<int>& noteOns = it->second;
+			int offset = *noteOns.begin();
+			sample.read(buffer, 0, offset, false);
+			for (auto itt = noteOns.begin(); itt != noteOns.end(); ++itt)
+			{
+				int noteOn = *itt;
+				auto ittt = itt;
+				++ittt;
+				if (ittt != noteOns.end())
+				{
+					int noteOnNext = *ittt;
+					int diff = noteOnNext - noteOn;
+					sample.read(buffer, offset, diff, true);
+					offset += diff;
+				}
+				else
+				{
+					sample.read(buffer, offset, buffer.getNumSamples() - offset, true);
+				}
+			}
+		}
+		else
+		{
+			sample.read(buffer, 0, buffer.getNumSamples(), false);
+		}
 	}
-
 }
 
 //==============================================================================
