@@ -58,6 +58,7 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         }
         try {
             JSONObject jObject = new JSONObject(name);
+//            String id = jObject.getString("id");
             name = jObject.getString("name");
             String imagePath = jObject.getString("img");
             String colorHex = jObject.getString("color");
