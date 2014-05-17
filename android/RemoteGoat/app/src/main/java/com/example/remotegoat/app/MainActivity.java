@@ -16,7 +16,7 @@ public class MainActivity extends Activity {
 
     private MicrophoneSampleView micSampleView;
     private FilesystemRecorder filesystemRecorder = new FilesystemRecorder();
-    public String id;
+    public static String instrumentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -29,7 +29,7 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
     public static String instrumentColor;
 
-    public GetInstrumentTask(Activity activity) {
+    public GetInstrumentTask(MainActivity activity) {
         this.activity = activity;
     }
 
@@ -58,7 +58,9 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         }
         try {
             JSONObject jObject = new JSONObject(name);
-//            String id = jObject.getString("id");
+            String id = jObject.getString("id");
+            GoatApplication goat = (GoatApplication) activity.getApplication();
+            goat.setInstrumentId(id);
             name = jObject.getString("name");
             String imagePath = jObject.getString("img");
             String colorHex = jObject.getString("color");
