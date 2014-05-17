@@ -34,6 +34,7 @@ RemoteGoatVstAudioProcessor::RemoteGoatVstAudioProcessor()
 {
 	writeTrace("Goat Trace!");
 	_repaintTimer = new RepaintTimer(this);
+	_play = false;
 }
 
 RemoteGoatVstAudioProcessor::~RemoteGoatVstAudioProcessor()
@@ -157,14 +158,35 @@ void RemoteGoatVstAudioProcessor::releaseResources()
 
 void RemoteGoatVstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-	//if (midiMessages.data.size() > 0)
-	if (0)
+	if (!midiMessages.isEmpty())
 	{
 		String trace;
-		trace << "Process block, "
-			<< buffer.getNumSamples() << " samples, "
-			<< midiMessages.data.size() << " MIDI";
+		trace << "MIDI:";
+		for (int i = 0; i < midiMessages.data.size(); ++i)
+		{
+			trace << String::formatted(" %02X", midiMessages.data[i]);
+		}
 		writeTrace(trace);
+
+		MidiBuffer::Iterator it(midiMessages);
+		MidiMessage midiMessage;
+		int samplePosition;
+		while (it.getNextEvent(midiMessage, samplePosition))
+		{
+			if (midiMessage.isNoteOn())
+			{
+				_play = true;
+				_lastNote = midiMessage.getNoteNumber();
+				_frequency = midiMessage.getMidiNoteInHertz(_lastNote);
+			}
+			else if (midiMessage.isNoteOff()
+				&& midiMessage.getNoteNumber() == _lastNote)
+			{
+				_play = false;
+			}
+		}
+
+		midiMessages.clear();
 	}
 
 	buffer.clear(0, 0, buffer.getNumSamples());
@@ -175,14 +197,14 @@ void RemoteGoatVstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
 	double sampleRate = this->getSampleRate();
 	float* left = buffer.getWritePointer(0);
 	float* right = buffer.getWritePointer(1);
-	double x = 2 * pi * 1 / (sampleRate / 440);
+	double x = 2 * pi * 1 / (sampleRate / _frequency);
 	for (int i = 0; i < buffer.getNumSamples(); ++i)
 	{
-		left[i] = right[i] = sin(x * t);
+		if (_play)
+			left[i] = right[i] = sin(x * t);
 		++t;
 	}
 
-	midiMessages.clear();
 }
 
 //==============================================================================

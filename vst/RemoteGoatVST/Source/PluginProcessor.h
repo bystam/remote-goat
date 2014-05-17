@@ -80,6 +80,10 @@ private:
 	const int _traceCount = 10;
 	RepaintTimer* _repaintTimer;
 
+	bool _play;
+	int _lastNote;
+	double _frequency;
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RemoteGoatVstAudioProcessor)
