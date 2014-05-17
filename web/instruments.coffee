@@ -1,4 +1,3 @@
-
 exports.setupAppForInstruments = (app) ->
   console.log 'app is now set up for instruments :D'
 
@@ -35,17 +34,17 @@ exports.setupAppForInstruments = (app) ->
 
 class InstrumentsQueue
   INSTRUMENTS = [
-    { id: 'BD', name: 'Base Drum' },
-    { id: 'SD', name: 'Snare Drum' },
-    { id: 'LT', name: 'Low Tom' },
-    { id: 'MT', name: 'Middle Tom' },
-    { id: 'HT', name: 'High Tom' },
-    { id: 'RS', name: 'Rim Shot' },
-    { id: 'CP', name: 'Clap' },
-    { id: 'CB', name: 'Cow Bell' },
-    { id: 'CY', name: 'Cymbal' },
-    { id: 'OH', name: 'Open Hi-Hat' },
-    { id: 'CH', name: 'Closed Hi-Hat' }
+    { id: 'BD', name: 'Base Drum', img: '/img/BD.jpg' },
+    { id: 'SD', name: 'Snare Drum', img: '/img/BD.jpg' },
+    { id: 'LT', name: 'Low Tom', img: '/img/BD.jpg' },
+    { id: 'MT', name: 'Middle Tom', img: '/img/BD.jpg' },
+    { id: 'HT', name: 'High Tom', img: '/img/BD.jpg' },
+    { id: 'RS', name: 'Rim Shot', img: '/img/BD.jpg' },
+    { id: 'CP', name: 'Clap', img: '/img/BD.jpg' },
+    { id: 'CB', name: 'Cow Bell', img: '/img/BD.jpg' },
+    { id: 'CY', name: 'Cymbal', img: '/img/BD.jpg' },
+    { id: 'OH', name: 'Open Hi-Hat', img: '/img/BD.jpg' },
+    { id: 'CH', name: 'Closed Hi-Hat', img: '/img/BD.jpg' }
   ]
 
   i: -1
