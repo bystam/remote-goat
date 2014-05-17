@@ -3,7 +3,11 @@ package com.example.remotegoat.app;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,7 +17,7 @@ import java.net.URL;
  */
 public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
-    private final String hostname = "http://jensarvidsson.se/";
+    private final String hostname = "http://46.59.25.115/";
     private Activity activity;
 
     public GetInstrumentTask(Activity activity) {
@@ -24,7 +28,7 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         URL url = null;
         try {
-            url = new URL(hostname);
+            url = new URL(hostname+"instruments");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -33,21 +37,26 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String response) {
-        if (response == null) {
-            //TODO: Somehow close the app or something who knows??!?!
-        }
         //TODO: Call class that creates gui here
         Context context = activity.getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
         CharSequence text;
-        if (response.startsWith("False")){
-            text = "Post failed";
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }else {
+        if (response == null) {
+            //TODO: Somehow close the app or something who knows??!?!
+            text = "Could not establish a connection";
+            return;
+        } else {
             text = response;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
         }
+        try {
+            JSONObject jObject = new JSONObject(text.toString());
+            text = jObject.getString("name");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+        Log.d("Instrument response", text.toString());
     }
 }
