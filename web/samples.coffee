@@ -5,9 +5,9 @@ exports.setupAppForSamples = (app) ->
 
 
 uploadSample = (req, res) ->
-  console.log req.files
-  console.log req.body
-  console.log req.files.file
+  for key, value of req
+    console.log "#{key} = #{value}"
+  return
   fs.readFile req.files.displayImage.path, (err, data) ->
     if err
       return console.log 'file read error #{err}'
