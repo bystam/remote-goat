@@ -83,7 +83,7 @@ public:
 		if (modification <= _lastModification)
 			return;
 		_lastModification = modification;
-		_processor->writeTrace(String() << "Updating " << _name);
+		_processor->writeTrace(String() << "Loading " << _name << " from disk");
 
 		// Read audio file. We only read the left channel, mono is good enough.
 		FileInputStream* stream = file.createInputStream();
@@ -92,6 +92,7 @@ public:
 		AudioSampleBuffer* buffer = &(_buffers[newIndex]);
 		buffer->setSize(1, reader->lengthInSamples);
 		reader->read(buffer, 0, (int)reader->lengthInSamples, 0, true, false);
+		delete reader;
 
 		// Done.
 		_readyToSwap = true;
@@ -132,15 +133,21 @@ class FilesystemTimer : public juce::Timer
 private:
 	RemoteGoatVstAudioProcessor* _processor;
 	int _period;
-	WavAudioFormat _wavAudioFormat;
+	WavAudioFormat* _wavAudioFormat;
 
 public:
 	FilesystemTimer(RemoteGoatVstAudioProcessor* processor) :
 		_processor(processor),
 		_period(200),
-		_wavAudioFormat()
+		_wavAudioFormat(new WavAudioFormat)
 	{
 		this->startTimer(_period);
+	}
+
+	~FilesystemTimer()
+	{
+		if (_wavAudioFormat != nullptr)
+			delete _wavAudioFormat;
 	}
 
 	virtual void timerCallback()
@@ -155,7 +162,7 @@ public:
 
 		for (const String& sampleName : SAMPLE_NAMES)
 		{
-			_processor->getSample(sampleName).update(path, _wavAudioFormat);
+			_processor->getSample(sampleName).update(path, *_wavAudioFormat);
 		}
 
 		this->startTimer(_period);
@@ -183,6 +190,7 @@ RemoteGoatVstAudioProcessor::RemoteGoatVstAudioProcessor()
 RemoteGoatVstAudioProcessor::~RemoteGoatVstAudioProcessor()
 {
 	delete _repaintTimer;
+	delete _filesystemTimer;
 }
 
 //==============================================================================
@@ -301,16 +309,16 @@ void RemoteGoatVstAudioProcessor::releaseResources()
 
 void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-	if (!midiMessages.isEmpty())
-	{
-		String trace;
-		trace << "MIDI:";
-		for (int i = 0; i < midiMessages.data.size(); ++i)
-		{
-			trace << String::formatted(" %02X", midiMessages.data[i]);
-		}
-		writeTrace(trace);
-	}
+	//if (!midiMessages.isEmpty())
+	//{
+	//	String trace;
+	//	trace << "MIDI:";
+	//	for (int i = 0; i < midiMessages.data.size(); ++i)
+	//	{
+	//		trace << String::formatted(" %02X", midiMessages.data[i]);
+	//	}
+	//	writeTrace(trace);
+	//}
 
 	// For each sample name,
 	// a sorted collection of "note on" event sample positions.
@@ -346,6 +354,7 @@ void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBu
 		auto noteOnSetsIterator = noteOnSets.find(sample.getName());
 		if (noteOnSetsIterator != noteOnSets.end())
 		{
+			writeTrace(String() << "Triggered " << sample.getName());
 			const std::set<int>& noteOns = noteOnSetsIterator->second;
 			int offset = *noteOns.begin();
 			sample.read(buffer, 0, offset, false);
