@@ -16,10 +16,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/recordButton"
         android:text="@string/recordButton"/>
-    <TextView
+    <com.example.remotegoat.app.MicrophoneSampleView
+        android:id="@+id/micSample"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
-        android:id="@+id/micDebug"/>
+        android:layout_height="200dp"/>
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -22,8 +22,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         new GetInstrumentTask(this).execute();
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
-        TextView micDebug = (TextView)findViewById(R.id.micDebug);
-        micSampleView = new MicrophoneSampleView(micDebug);
+//        micSampleView = new MicrophoneSampleView(this);
+        micSampleView = (MicrophoneSampleView) findViewById(R.id.micSample);
         Button recordingButton = (Button) findViewById(R.id.recordButton);
 
         recordingButton.setOnClickListener(new View.OnClickListener() {
