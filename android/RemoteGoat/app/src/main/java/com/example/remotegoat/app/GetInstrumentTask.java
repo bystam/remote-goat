@@ -13,6 +13,7 @@ import java.net.URL;
  */
 public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
+    private final String hostname = "http://jensarvidsson.se/";
     private Activity activity;
 
     public GetInstrumentTask(Activity activity) {
@@ -21,13 +22,13 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        URL host = null;
+        URL url = null;
         try {
-            host = new URL("http://dxtr.se/");
+            url = new URL(hostname);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        return ResponseReader.getResponse(host);
+        return ResponseReader.getResponse(url);
     }
 
     @Override
@@ -35,6 +36,7 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         if (response == null) {
             //TODO: Somehow close the app or something who knows??!?!
         }
+        //TODO: Call class that creates gui here
         Context context = activity.getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
         CharSequence text;
