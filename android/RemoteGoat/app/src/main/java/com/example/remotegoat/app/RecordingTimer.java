@@ -94,8 +94,6 @@ public class RecordingTimer {
             Thread.sleep(RECORDING_TIME);
             mediaRecorder.stop();
             mediaRecorder.release();
-            Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
-            sendFileButton.setEnabled(true);
         }
     }
 
@@ -106,14 +104,19 @@ public class RecordingTimer {
         @Override
         public void run() {
             microphoneSampleView.updateAnimation(2);
+            progress += 2;
+            if(progress> 90);
             if(runningSession())
                 animationUpdater.postDelayed(this, ANIMATION_INTERVAL);
             if(startRecording() && !recorded) {
                 timer.execute(new AudioRecorder());
                 recorded = true;
             }
-            if(!runningSession())
+            if(!runningSession()){
                 microphoneSampleView.stopAnimation();
+                Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
+                sendFileButton.setEnabled(true);
+            }
         }
     }
 
