@@ -101,14 +101,17 @@ public class RecordingTimer {
 
     private class IntervalAnimationUpdate implements Runnable {
         private int progress = 0;
+        private boolean recorded = false;
 
         @Override
         public void run() {
             microphoneSampleView.updateAnimation(2);
             if(runningSession())
                 animationUpdater.postDelayed(this, ANIMATION_INTERVAL);
-            if(startRecording())
+            if(startRecording() && !recorded) {
                 timer.execute(new AudioRecorder());
+                recorded = true;
+            }
             if(!runningSession())
                 microphoneSampleView.stopAnimation();
         }
