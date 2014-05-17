@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
-
 public class MainActivity extends Activity {
 
     private static final int RECORDER_SAMPLERATE = 8000;
@@ -62,4 +61,5 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
