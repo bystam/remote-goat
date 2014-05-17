@@ -3,7 +3,6 @@ exports.appAndServerWithJade = ->
   http = require 'http'
   bodyparser = require 'body-parser'
   midi = require 'midi'
-  connect = require 'connect'
   multer = require 'multer'
 
   app = express()
