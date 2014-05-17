@@ -87,20 +87,19 @@ public class MicrophoneSampleView implements SurfaceHolder.Callback {
 
         @Override
         public void run() {
-
             while (true) {
-
+                Bitmap bitmap =  Bitmap.createBitmap(holder.getSurfaceFrame().width(), holder.getSurfaceFrame().height(), Bitmap.Config.ARGB_8888);
+                Canvas bitmapCanvas = new Canvas(bitmap);
+                drawAnimation(bitmapCanvas);
                 Canvas canvas = holder.lockCanvas();
-
-
-//                String hexBackgroundColor = GetInstrumentTask.instrumentColor;
-//                Color background = new Color();//Color.parseColor(hexBackgroundColor);
                 if (canvas == null) {
                 } else {
                     if (animationRunning) {
-                        drawAnimation(canvas);
+                        Paint p = new Paint ();
+                        p.setColor(Color.BLACK);
+                        canvas.drawBitmap(bitmap, 0,0 , p);
+//                        drawAnimation(canvas);
                     } else {
-
                         }
                     }
                     holder.unlockCanvasAndPost(canvas);
@@ -108,7 +107,6 @@ public class MicrophoneSampleView implements SurfaceHolder.Callback {
         }
 
         private void drawAnimation(Canvas canvas) {
-
             canvas.drawARGB(255, 255, 128, 128);
             Paint color = new Paint();
             color.setColor(Color.BLACK);
