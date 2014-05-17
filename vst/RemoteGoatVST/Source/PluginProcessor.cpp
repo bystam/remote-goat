@@ -41,6 +41,7 @@ private:
 	int _bufferIndex;
 	Time _lastModification;
 	bool _readyToSwap;
+	bool _alive;
 
 public:
 	const char* EXT = ".wav";
@@ -55,7 +56,8 @@ public:
 		_name(name),
 		_bufferIndex(0),
 		_lastModification(0),
-		_readyToSwap(false)
+		_readyToSwap(false),
+		_alive(false)
 	{
 		memset(_offsets, 0, sizeof(_offsets));
 	}
@@ -104,10 +106,13 @@ public:
 	{
 		if (isNoteOn)
 		{
+			_alive = true;
 			if (_readyToSwap)
 				swap();
 			_offsets[_bufferIndex] = 0;
 		}
+		if (!_alive)
+			return;
 		AudioSampleBuffer* buffer = &(_buffers[_bufferIndex]);
 		if (buffer->getNumChannels() == 0)
 			return;
@@ -117,6 +122,12 @@ public:
 		output.addFrom(0, offset, data, count);
 		output.addFrom(1, offset, data, count);
 		_offsets[_bufferIndex] += count;
+	}
+
+	void noteOff()
+	{
+		_alive = false;
+		_offsets[_bufferIndex] = 0; // XXX: Race.
 	}
 
 private:
@@ -322,24 +333,25 @@ void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBu
 
 	// For each sample name,
 	// a sorted collection of "note on" event sample positions.
-	std::map<String, std::set<int>> noteOnSets;
+	std::map<String, std::set<std::pair<int, bool>>> noteOnSets;
 
 	MidiBuffer::Iterator it(midiMessages);
 	MidiMessage midiMessage;
 	int samplePosition;
 	while (it.getNextEvent(midiMessage, samplePosition))
 	{
-		if (midiMessage.isNoteOn())
+		// Check note number, map to sample name.
+		int note = midiMessage.getNoteNumber();
+		auto itt = _noteNumberSampleNameMap.find(note);
+		if (itt != _noteNumberSampleNameMap.end())
 		{
-			// Check note number, map to sample name.
-			// Save note on sample position for sample.
-			int note = midiMessage.getNoteNumber();
-			auto itt = _noteNumberSampleNameMap.find(note);
-			if (itt != _noteNumberSampleNameMap.end())
-			{
-				String sampleName = itt->second;
-				noteOnSets[sampleName].insert(samplePosition);
-			}
+			String sampleName = itt->second;
+
+			if (midiMessage.isNoteOn())
+				// Save note on sample position for sample.
+				noteOnSets[sampleName].insert(std::make_pair(samplePosition, true));
+			else if (midiMessage.isNoteOff())
+				noteOnSets[sampleName].insert(std::make_pair(samplePosition, false));
 		}
 	}
 
@@ -354,25 +366,32 @@ void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBu
 		auto noteOnSetsIterator = noteOnSets.find(sample.getName());
 		if (noteOnSetsIterator != noteOnSets.end())
 		{
-			writeTrace(String() << "Triggered " << sample.getName());
-			const std::set<int>& noteOns = noteOnSetsIterator->second;
-			int offset = *noteOns.begin();
+			const std::set<std::pair<int, bool>>& noteOns = noteOnSetsIterator->second;
+			int offset = noteOns.begin()->first;
 			sample.read(buffer, 0, offset, false);
 			for (auto noteOnIterator = noteOns.begin(); noteOnIterator != noteOns.end(); ++noteOnIterator)
 			{
-				int noteOn = *noteOnIterator;
+				int noteOn = noteOnIterator->first;
+				bool onOrOff = noteOnIterator->second;
+				writeTrace(String() << "Triggered " << sample.getName() + " (" << (int)onOrOff << ")");
 				auto nextNoteOnIterator = noteOnIterator;
 				++nextNoteOnIterator;
 				if (nextNoteOnIterator != noteOns.end())
 				{
-					int nextNoteOn = *nextNoteOnIterator;
+					int nextNoteOn = nextNoteOnIterator->first;
 					int diff = nextNoteOn - noteOn;
-					sample.read(buffer, offset, diff, true);
+					if (onOrOff)
+						sample.read(buffer, offset, diff, true);
+					else
+						sample.noteOff();
 					offset += diff;
 				}
 				else
 				{
-					sample.read(buffer, offset, buffer.getNumSamples() - offset, true);
+					if (onOrOff)
+						sample.read(buffer, offset, buffer.getNumSamples() - offset, true);
+					else
+						sample.noteOff();
 				}
 			}
 		}
