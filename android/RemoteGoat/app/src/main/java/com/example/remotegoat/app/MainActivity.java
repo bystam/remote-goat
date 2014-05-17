@@ -2,7 +2,6 @@ package com.example.remotegoat.app;
 
 import android.app.Activity;
 import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.Menu;
@@ -27,19 +26,25 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
         mainLayout.addView(micSampleView);
-
-
     }
 
-    private void startRecording (){
-        new RecordingTimer(getMediaRecorder(),micSampleView, filesystemRecorder).startRecordingSession();
+    private MediaRecorder getMediaRecorder (){
+        MediaRecorder mRecorder = new MediaRecorder();
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setOutputFile("/dev/null");
+//        mRecorder.prepare();
+//        mRecorder.start();
+        return mRecorder;
     }
 
-    private AudioRecord getMediaRecorder (){
-        AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                RECORDER_SAMPLERATE, RECORDER_CHANNELS,
-                RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
-        return recorder;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
     @Override
