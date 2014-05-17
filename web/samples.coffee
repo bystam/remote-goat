@@ -5,8 +5,13 @@ exports.setupAppForSamples = (app) ->
 
 
 uploadSample = (req, res) ->
+  console.log req
   fs.readFile req.files.displayImage.path, (err, data) ->
+    if err
+      return console.log 'file read error #{err}'
+
     newPath = './upload'
+    res.json { status: 'file received' }
     fs.writeFile newPath, data, (err) ->
       console.log 'file upload error #{err}'
 
