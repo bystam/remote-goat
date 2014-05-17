@@ -5,5 +5,5 @@
 app.get '/', (req, res) ->
   res.render 'index', {}
 
-server.listen 5000, ->
-  console.log 'started listending on port 5000'
+server.listen 80, ->
+  console.log 'started listending on port 80'

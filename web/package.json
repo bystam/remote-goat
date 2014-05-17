@@ -5,7 +5,7 @@
   "main": "main.coffee",
   "scripts": {
     "test": "nodeunit test",
-    "start": "coffee main.coffee -n"
+    "start": "sudo coffee main.coffee -n"
   },
   "repository": {
     "type": "git",
