@@ -1,5 +1,6 @@
 fs = require 'node-fs'
 path = require 'path'
+wav = require './wav'
 
 exports.setupAppForSamples = (app) ->
   app.post '/sample', uploadSample
@@ -12,6 +13,9 @@ uploadSample = (req, res) ->
     if err?
       return console.log '#{err}'
     console.log 'LJUD ACUALLY IS SAVED'
+    wav.convertToWav newPath, (err) ->
+      if err?
+        console.log 'convert error :D'
 	
 
 

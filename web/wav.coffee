@@ -1,7 +1,7 @@
 exec = (require 'child_process').exec
 path = require 'path'
 
-exports.convertToWav = (oldPath) ->
+exports.convertToWav = (oldPath, callback) ->
   dir = path.dirname oldPath
   ext = path.extname oldPath
   base = path.basename oldPath, ext
@@ -10,5 +10,4 @@ exports.convertToWav = (oldPath) ->
   command = "ffmpeg -i #{oldPath} #{newPath}"
 
   console.log command
-  exec command, () ->
-    console.log 'SOMETHING HAPPENED AT LEAST :D'
+  exec command, callback
