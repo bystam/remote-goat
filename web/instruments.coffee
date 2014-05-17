@@ -9,7 +9,7 @@ exports.setupAppForInstruments = (app) ->
 class InstrumentsQueue
   INSTRUMENTS = [
     { id: 'BD', name: 'Base Drum', img: 'img/BD.jpg' },
-    { id: 'SD', name: 'Snare Drum', img: 'img/BD.jpg' },
+    { id: 'SD', name: 'Snare Drum', img: 'img/SD.jpg' },
     { id: 'LT', name: 'Low Tom', img: 'img/BD.jpg' },
     { id: 'MT', name: 'Middle Tom', img: 'img/BD.jpg' },
     { id: 'HT', name: 'High Tom', img: 'img/BD.jpg' },
