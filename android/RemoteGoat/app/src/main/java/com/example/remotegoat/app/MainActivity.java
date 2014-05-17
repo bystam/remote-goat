@@ -3,6 +3,7 @@ package com.example.remotegoat.app;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,6 +44,7 @@ public class MainActivity extends Activity {
 
 
     private void startRecording (){
+        Log.d("STARTING", "starting recording sesh");
         try {
             new RecordingTimer(micSampleView, filesystemRecorder).startRecordingSession();
         } catch (Exception e) {

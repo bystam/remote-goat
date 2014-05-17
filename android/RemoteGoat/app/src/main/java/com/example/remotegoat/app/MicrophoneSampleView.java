@@ -21,14 +21,9 @@ public class MicrophoneSampleView {
         debugOutput.setText("Starting animation");
     }
 
-    public void updateAnimation(short[] amplitudes){
-        int average = 0;
-        for (int i=0;i< amplitudes.length;i++) {
-            average += amplitudes[i];
-            Log.d("update",""+amplitudes[i] );
-        }
-        average = average/amplitudes.length;
-        debugOutput.setText("amplitude: " + average);
+    public void updateAnimation(int amplitudes){
+
+        debugOutput.setText("amplitude: " + amplitudes);
     }
 
     public void stopAnimation(){
