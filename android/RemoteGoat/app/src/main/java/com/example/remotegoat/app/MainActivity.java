@@ -7,43 +7,41 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
 
-    private static final int RECORDER_SAMPLERATE = 8000;
-    private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
-    private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-
-    int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
-    int BytesPerElement = 2; // 2 bytes in 16bit format
-
-    private MicrophoneSampleView micSampleView = new MicrophoneSampleView(this);
+    private MicrophoneSampleView micSampleView;
     private FilesystemRecorder filesystemRecorder = new FilesystemRecorder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
-        mainLayout.addView(micSampleView);
-
+//        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
+        TextView micDebug = (TextView)findViewById(R.id.micDebug);
+        micSampleView = new MicrophoneSampleView(micDebug);
+        Button recordingButton = (Button) findViewById(R.id.recordButton);
+        recordingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startRecording();
+            }
+        });
 
     }
 
     private void startRecording (){
-        new RecordingTimer(getMediaRecorder(),micSampleView, filesystemRecorder).startRecordingSession();
+        try {
+            new RecordingTimer(micSampleView, filesystemRecorder).startRecordingSession();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-    private AudioRecord getMediaRecorder (){
-        AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                RECORDER_SAMPLERATE, RECORDER_CHANNELS,
-                RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
-        return recorder;
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

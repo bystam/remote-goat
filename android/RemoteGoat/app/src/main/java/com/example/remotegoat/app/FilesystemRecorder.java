@@ -8,4 +8,8 @@ public class FilesystemRecorder {
     public FilesystemRecorder(){
 
     }
+
+    public void record (int[] input){
+
+    }
 }
