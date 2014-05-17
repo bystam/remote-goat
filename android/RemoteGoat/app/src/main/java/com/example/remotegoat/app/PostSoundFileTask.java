@@ -54,7 +54,7 @@ public class PostSoundFileTask extends AsyncTask<String, Void, String> {
 
     public String post(String url) {
         // the file to be posted
-        String filePath = Environment.getExternalStorageDirectory() + "/recording.3gpp";
+        String filePath = Environment.getExternalStorageDirectory() + "/recording.mp4";
 
         Log.d("file path", filePath);
         // the URL where the file will be posted

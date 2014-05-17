@@ -1,6 +1,7 @@
 package com.example.remotegoat.app;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -44,6 +46,9 @@ public class MicrophoneSampleView implements SurfaceHolder.Callback {
     public void updateAnimation(int amplitude){
         this.amplitude = amplitude*20;
         xCoord++;
+        Point next = new Point(xCoord + 150, amplitude + 100);
+        Point reverse = new Point(xCoord + 150, -amplitude + 100);
+        animator.points.add(new Line(next, reverse));
     }
 
     public void stopAnimation(){
@@ -74,7 +79,7 @@ public class MicrophoneSampleView implements SurfaceHolder.Callback {
 
     private class Animator implements Runnable {
         private SurfaceHolder holder;
-        private ArrayList<Line> points = new ArrayList<Line>();
+        public ConcurrentLinkedQueue<Line> points = new ConcurrentLinkedQueue<Line>();
 
         public Animator(SurfaceHolder hold) {
             holder = hold;
@@ -82,35 +87,42 @@ public class MicrophoneSampleView implements SurfaceHolder.Callback {
 
         @Override
         public void run() {
+
             while (true) {
+
                 Canvas canvas = holder.lockCanvas();
+
+
+//                String hexBackgroundColor = GetInstrumentTask.instrumentColor;
+//                Color background = new Color();//Color.parseColor(hexBackgroundColor);
                 if (canvas == null) {
                 } else {
-                    if (animationRunning)
+                    if (animationRunning) {
                         drawAnimation(canvas);
-                    else
-                        points.clear();
+                    } else {
+
+                        }
+                    }
                     holder.unlockCanvasAndPost(canvas);
                 }
-            }
         }
 
         private void drawAnimation(Canvas canvas) {
 
-            Point next = new Point(xCoord + 150, amplitude + 100);
-            Point reverse = new Point(xCoord + 150, -amplitude + 100);
-            points.add(new Line(next, reverse));
+            canvas.drawARGB(255, 255, 128, 128);
             Paint color = new Paint();
             color.setColor(Color.BLACK);
             color.setStrokeWidth(10);
-            canvas.drawRGB(255, 128, 128);
             for(Line line : points) {
                 canvas.drawLine(line.start.x, line.start.y, line.end.x, line.end.y, color);
             }
         }
 
         public void clear (){
-//            points.clear();
+            points.clear();
+            Canvas canvas = holder.lockCanvas();
+            canvas.drawARGB(255, 255, 128, 128);
+            holder.unlockCanvasAndPost(canvas);
 //            path.reset();
         }
 

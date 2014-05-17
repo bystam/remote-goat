@@ -57,7 +57,8 @@ public class RecordingTimer {
     private MediaRecorder getMediaRecorder (String outputFile){
         MediaRecorder recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        recorder.setAudioSamplingRate(RECORDER_SAMPLERATE);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         recorder.setOutputFile(outputFile);
         try {
@@ -88,10 +89,10 @@ public class RecordingTimer {
         }
 
         private void record() throws IOException {
-            byte[] recordingBuffer = new byte[200];
+            byte[] recordingBuffer = new byte[1000];
             recorder.startRecording();
             while (preRecordingPhase()){
-                recorder.read(recordingBuffer, 0, 200);
+                recorder.read(recordingBuffer, 0, 1000);
                 int average = 0;
                 for (int i=0;i< recordingBuffer.length;i++) {
                     average += recordingBuffer[i];
@@ -102,7 +103,7 @@ public class RecordingTimer {
             recorder.stop();
             recorder.release();
 
-            MediaRecorder mediaRecorder = getMediaRecorder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+"recording.3gpp");
+            MediaRecorder mediaRecorder = getMediaRecorder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+"recording.mp4");
             mediaRecorder.start();
             while(runningSession())
                 currentAmplitude = mediaRecorder.getMaxAmplitude();

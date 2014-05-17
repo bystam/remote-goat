@@ -26,6 +26,8 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
     private String hostname = "http://192.168.43.6/";
     private Activity activity;
 
+    public static String instrumentColor;
+
     public GetInstrumentTask(Activity activity) {
         this.activity = activity;
     }
@@ -58,6 +60,7 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
             name = jObject.getString("name");
             String imagePath = jObject.getString("img");
             String colorHex = jObject.getString("color");
+            instrumentColor = colorHex;
             updateGUI(name, imagePath, colorHex);
         } catch (JSONException e) {
             e.printStackTrace();
