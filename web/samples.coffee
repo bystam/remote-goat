@@ -9,14 +9,16 @@ exports.setupAppForSamples = (app) ->
 uploadSample = (req, res) ->
   [oldPath, newPath] = getRenamePaths req.files.audiofile, req.body.id
 
-  fs.rename oldPath, newPath, (err) ->
-    if err?
-      return console.log '#{err}'
+  fs.rename oldPath, newPath, (renameErr) ->
+    if renameErr?
+      return console.log '#{renameErr}'
     console.log 'LJUD ACUALLY IS SAVED'
-    wav.convertToWav newPath, (err) ->
-      if err?
+    wav.convertToWav newPath, (convertErr) ->
+      if convertErr?
         console.log 'convert error :D'
-	
+      fs.unlink newPath, (unlinkErr) ->
+        if unlinkErr?
+          console.log 'unlink file failed'
 
 
 console.log 'app is set up for sample uploading'

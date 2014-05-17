@@ -7,12 +7,11 @@ exports.convertToWav = (oldPath, callback) ->
   goatDir = getGoatDir()
   newPath = path.resolve goatDir, (base + '.wav')
 
-  command = "ffmpeg -i #{oldPath} #{newPath}"
+  command = "ffmpeg -i #{oldPath} #{newPath} -y"
 
   console.log command
   exec command, callback
 
 getGoatDir = () ->
-  envVar = process.platform is 'win32' ? 'USERPROFILE' : 'HOME'
-  home = process.env[envVar] 
-  return path.resolve home '.remote-goat'
+  home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
+  return path.resolve home, '.remote-goat'
