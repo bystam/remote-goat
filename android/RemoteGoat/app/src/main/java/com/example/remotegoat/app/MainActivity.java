@@ -1,8 +1,7 @@
 package com.example.remotegoat.app;
 
 import android.app.Activity;
-import android.media.AudioFormat;
-import android.media.MediaRecorder;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,16 +19,24 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        new GetInstrumentTask(this).execute();
-        new PostSoundFileTask(this).execute();
+        new GetInstrumentTask(this).execute();
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
         TextView micDebug = (TextView)findViewById(R.id.micDebug);
         micSampleView = new MicrophoneSampleView(micDebug);
         Button recordingButton = (Button) findViewById(R.id.recordButton);
+
         recordingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startRecording();
+            }
+        });
+
+        Button sendFileButton = (Button) findViewById(R.id.sendButton);
+        sendFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new PostSoundFileTask(MainActivity.this).execute();
             }
         });
     }

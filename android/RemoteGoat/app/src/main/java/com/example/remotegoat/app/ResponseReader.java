@@ -1,5 +1,7 @@
 package com.example.remotegoat.app;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -42,6 +44,31 @@ public class ResponseReader {
             br.close();
 
             return sb.toString();
+
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Bitmap getImage(URL host) {
+        InputStream is;
+        try {
+            HttpURLConnection conn = (HttpURLConnection) host.openConnection();
+            conn.setReadTimeout(15000 /* milliseconds */);
+            conn.setConnectTimeout(5000 /* milliseconds */);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.connect();
+            is = conn.getInputStream();
+            Bitmap image = BitmapFactory.decodeStream(is);
+            int response = conn.getResponseCode();
+            if (response != 200) {
+                return null;
+            }
+            return image;
 
         } catch (ProtocolException e) {
             e.printStackTrace();

@@ -17,7 +17,7 @@ import java.net.URL;
  */
 public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
-    private final String hostname = "http://46.59.25.115/";
+    private String hostname = "http://192.168.43.6/";
     private Activity activity;
 
     public GetInstrumentTask(Activity activity) {
