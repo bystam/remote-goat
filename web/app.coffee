@@ -6,7 +6,7 @@ exports.appAndServerWithJade = ->
   app = express()
         .use express.static(__dirname + '/public')
         .use (require 'morgan')() # logger
-        .use bodyparser
+        .use bodyparser()
         .set 'view engine', 'jade'
         .set 'views', __dirname + '/views'
 
