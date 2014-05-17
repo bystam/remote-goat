@@ -5,7 +5,7 @@ exports.setupAppForSamples = (app) ->
 
 
 uploadSample = (req, res) ->
-  console.log req.body.file
+  console.log req.body
   fs.readFile req.files.displayImage.path, (err, data) ->
     if err
       return console.log 'file read error #{err}'
