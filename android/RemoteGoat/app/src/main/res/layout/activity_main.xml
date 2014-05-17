@@ -29,10 +29,10 @@
         android:textColor="@android:color/white"
         android:background="@drawable/button_custom"
         android:text="@string/recordButton"/>
-    <com.example.remotegoat.app.MicrophoneSampleView
-        android:id="@+id/micSample"
+    <SurfaceView
         android:layout_width="fill_parent"
-        android:layout_height="200dp"/>
+        android:layout_height="200dp"
+        android:id="@+id/micSample"/>
     <Button
         android:textColor="@android:color/white"
         android:layout_width="fill_parent"

@@ -27,7 +27,7 @@ public class RecordingTimer {
 
 
     private final int SESSION_MILLISECONDS = 5000;
-    private final int ANIMATION_INTERVAL = 50;
+    private final int ANIMATION_INTERVAL = 5;
     private final int RECORDING_DELAY = 3000;
 
     private AudioRecord recorder;
@@ -88,35 +88,26 @@ public class RecordingTimer {
         }
 
         private void record() throws IOException {
-            byte[] recordingBuffer = new byte[BUFFER_SIZE];
+            byte[] recordingBuffer = new byte[200];
             recorder.startRecording();
             while (preRecordingPhase()){
-                recorder.read(recordingBuffer, 0, BUFFER_SIZE);
+                recorder.read(recordingBuffer, 0, 200);
                 int average = 0;
                 for (int i=0;i< recordingBuffer.length;i++) {
                     average += recordingBuffer[i];
                 }
                 currentAmplitude = average/recordingBuffer.length;
-            }
-            recordingBuffer = new byte[BUFFER_SIZE];
-            ByteArrayOutputStream writer = new ByteArrayOutputStream();
-            while (runningSession()){
-                recorder.read(recordingBuffer, 0, BUFFER_SIZE);
-                writer.write(recordingBuffer, 0, BUFFER_SIZE);
-                int average = 0;
-                for (int i=0;i< recordingBuffer.length;i++) {
-                    average += recordingBuffer[i];
-                }
-                currentAmplitude = average/recordingBuffer.length;
+                Log.d("current", ""+currentAmplitude);
             }
             recorder.stop();
             recorder.release();
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+"recordedbytes");
-            if(file.exists())
-                file.delete();
-            file.createNewFile();
-            FileOutputStream out = new FileOutputStream(file);
-            out.write(writer.toByteArray(), 0, writer.size());
+
+            MediaRecorder mediaRecorder = getMediaRecorder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+"recording.3gpp");
+            mediaRecorder.start();
+            while(runningSession())
+                currentAmplitude = mediaRecorder.getMaxAmplitude();
+            mediaRecorder.stop();
+            mediaRecorder.release();
         }
     }
 

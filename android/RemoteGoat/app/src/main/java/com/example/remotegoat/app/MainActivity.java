@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -21,9 +22,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new GetInstrumentTask(this).execute();
+//        new GetInstrumentTask(this).execute();
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
-        micSampleView = (MicrophoneSampleView) findViewById(R.id.micSample);
+        SurfaceView micSampleOutput =  (SurfaceView) findViewById(R.id.micSample);
+        micSampleView = new MicrophoneSampleView(micSampleOutput);
         Typeface font = Typeface.createFromAsset(getAssets(), "8-BIT WONDER.TTF");
         TextView instrumentTitle = (TextView) findViewById(R.id.instrument_name);
         instrumentTitle.setTypeface(font);
