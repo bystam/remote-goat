@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        new GetInstrumentTask(this).execute();
+        new GetInstrumentTask(this).execute();
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
         SurfaceView micSampleOutput =  (SurfaceView) findViewById(R.id.micSample);
         micSampleView = new MicrophoneSampleView(micSampleOutput);
@@ -34,7 +34,6 @@ public class MainActivity extends Activity {
         int titleId = getResources().getIdentifier("action_bar_title", "id",
                 "android");
         TextView title = (TextView) findViewById(titleId);
-//        yourTextView.setTextColor(getResources().getColor(R.color.black));
         title.setTypeface(font);
 
         recordingButton.setOnClickListener(new View.OnClickListener() {
