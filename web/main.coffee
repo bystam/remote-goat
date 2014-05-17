@@ -1,5 +1,5 @@
 [app, server] = (require './app').appAndServerWithJade()
-(require './io').setupIo app, server
+# (require './io').setupIo app, server
 
 app
 .get '/', (req, res) ->
