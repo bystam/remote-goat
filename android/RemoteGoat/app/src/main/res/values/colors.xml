@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="dark_grey">#333</color>
-    <color name="base_drum">#f00</color>
-    <color name="snare_drum">#80ff0000</color>
 </resources>

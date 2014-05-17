@@ -2,6 +2,7 @@ package com.example.remotegoat.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -56,7 +57,8 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
             JSONObject jObject = new JSONObject(name);
             name = jObject.getString("name");
             String imagePath = jObject.getString("img");
-            updateGUI(name, imagePath);
+            String colorHex = jObject.getString("color");
+            updateGUI(name, imagePath, colorHex);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -66,13 +68,13 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         Log.d("Instrument response", name.toString());
     }
 
-    private void updateGUI(String name, String imagePath) {
+    private void updateGUI(String name, String imagePath, String colorHex) {
         ImageView instrumentImage = (ImageView) activity.findViewById(R.id.instrument_image);
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(hostname + imagePath, instrumentImage);
         TextView instrumentTitle = (TextView) activity.findViewById(R.id.instrument_name);
         instrumentTitle.setText(name);
         View mainView = activity.getWindow().getDecorView();
-        mainView.setBackgroundColor(activity.getResources().getColor(R.color.base_drum));
+        mainView.setBackgroundColor(Color.parseColor(colorHex));
     }
 }
