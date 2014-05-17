@@ -2,12 +2,15 @@ html
   head
     title lolfi golfi
     link(rel='stylesheet', href='/css/style.css')
-
-    script(src='/siofu/client.js')
+    script(src='http://code.jquery.com/jquery-1.11.1.min.js')
     script(src='/socket.io/socket.io.js')
     script(src='/js/upload.js')
   body
     .box
-      input#file_input(type='file')
-      button#upload_btn Upload file!
-      #file_drop Drop files here!
+      form(action="/sample", method="post", enctype="multipart/form-data")
+        input(type="file", name="audiofile")
+        input(type='submit')
+      p#acc lol
+      p#x alfi
+      p#y malfi
+      p#z salfi

@@ -1,16 +1,16 @@
-document.addEventListener("DOMContentLoaded", function(){
-  // Initialize instances:
-  var socket = io.connect();
-  var siofu = new SocketIOFileUpload(socket);
+$(function () {
+  var socket = io.connect('http://localhost');
+  socket.emit ('shake', {});
 
-  // Configure the three ways that SocketIOFileUpload can read files:
-  document.getElementById("upload_btn").addEventListener("click", siofu.prompt, false);
-  siofu.listenOnInput(document.getElementById("upload_input"));
-  siofu.listenOnDrop(document.getElementById("file_drop"));
-
-  // Do something when a file is uploaded:
-  siofu.addEventListener("complete", function(event){
-      console.log(event.success);
-      console.log(event.file);
-  });
-}, false);
+  if (window.DeviceMotionEvent) {
+    $('#acc').text('motion is supported');
+    window.addEventListener('devicemotion', function(event) {
+      var acc = event.acceleration;
+      $('#x').text(acc.x);
+      $('#y').text(acc.y);
+      $('#z').text(acc.z);
+    });
+  } else {
+    $('#acc').text('acc is supported');
+  }
+});

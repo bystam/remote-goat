@@ -9,3 +9,4 @@ README.html
 test/*.js
 *.log
 .uploads
+uploads
