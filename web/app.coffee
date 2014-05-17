@@ -10,7 +10,7 @@ exports.appAndServerWithJade = ->
         .use express.static(__dirname + '/public')
         .use (require 'morgan')() # logger
         .use bodyparser()
-        .use multer({ dest: './.uploads'})
+        .use multer({ dest: './uploads'})
         .set 'view engine', 'jade'
         .set 'views', __dirname + '/views'
 

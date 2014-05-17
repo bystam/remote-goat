@@ -6,21 +6,20 @@ exports.setupAppForSamples = (app) ->
 
 
 uploadSample = (req, res) ->
-  [oldPath, newFile] = getRenamePaths (req.files.audiofile)
+  [oldPath, newPath] = getRenamePaths req.files.audiofile, req.body.id
 
   fs.rename oldPath, newPath, (err) ->
     if err?
       return console.log '#{err}'
-    console.log 'IMAGE ACUALLY IS SAVED'
+    console.log 'LJUD ACUALLY IS SAVED'
 
 console.log 'app is set up for sample uploading'
 
-getRenamePaths = (audiofile) ->
-  oldPath = req.files.audiofile.path
+getRenamePaths = (audiofile, id) ->
+  oldPath = audiofile.path
   dir = path.dirname(oldPath)
   ext = path.extname(oldPath)
-  basename = path.basename(oldPath, ext)
-  newName = basename + ext
+  newName = id + ext
   newPath = path.resolve dir, newName
 
   return [oldPath, newPath]
