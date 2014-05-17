@@ -1,9 +1,11 @@
 package com.example.remotegoat.app;
 
 import android.app.Activity;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 
 public class MainActivity extends Activity {
@@ -12,6 +14,24 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
+        mainLayout.addView(new MicrophoneSampleView(this, getMediaRecorder()));
+
+    }
+
+    private void startRecording (){
+
+    }
+
+    private MediaRecorder getMediaRecorder (){
+        MediaRecorder mRecorder = new MediaRecorder();
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setOutputFile("/dev/null");
+//        mRecorder.prepare();
+//        mRecorder.start();
+        return mRecorder;
     }
 
 
