@@ -8,6 +8,14 @@
             <corners android:bottomLeftRadius="7dp" android:bottomRightRadius="7dp" android:topLeftRadius="7dp" android:topRightRadius="7dp" />
         </shape>
     </item>
+    <item android:state_disabled="true" >
+        <shape>
+            <stroke android:width="2dp" android:color="#fff" />
+
+            <solid android:color="#222" />
+            <corners android:bottomLeftRadius="7dp" android:bottomRightRadius="7dp" android:topLeftRadius="7dp" android:topRightRadius="7dp" />
+        </shape>
+    </item>
     <item>
         <shape>
             <stroke android:width="2dp" android:color="#000" />
