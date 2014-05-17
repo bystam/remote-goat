@@ -10,6 +10,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -23,7 +24,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         new GetInstrumentTask(this).execute();
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
-        SurfaceView micSampleOutput =  (SurfaceView) findViewById(R.id.micSample);
+        ProgressBar micSampleOutput =  (ProgressBar) findViewById(R.id.micSample);
         micSampleView = new MicrophoneSampleView(micSampleOutput);
         Typeface font = Typeface.createFromAsset(getAssets(), "8-BIT WONDER.TTF");
         TextView instrumentTitle = (TextView) findViewById(R.id.instrument_name);

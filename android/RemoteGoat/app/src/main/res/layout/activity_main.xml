@@ -31,10 +31,14 @@
         android:textColor="@android:color/white"
         android:background="@drawable/button_custom"
         android:text="@string/recordButton"/>
-    <SurfaceView
+    <ProgressBar
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
-        android:id="@+id/micSample"/>
+        android:layout_height="50dp"
+        android:max="100"
+        android:id="@+id/micSample"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_marginRight="5dp" />
+
     <Button
         android:visibility="invisible"
         android:enabled="false"

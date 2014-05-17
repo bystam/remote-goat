@@ -1,20 +1,14 @@
 package com.example.remotegoat.app;
 
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
-import android.util.Log;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import android.os.Handler;
-import android.widget.Button;
 
 /**
  * Created by jensa on 17/05/2014.
@@ -28,8 +22,10 @@ public class RecordingTimer {
 
 
     private final int SESSION_MILLISECONDS = 5000;
-    private final int ANIMATION_INTERVAL = 5;
-    private final int RECORDING_DELAY = 3000;
+    private final int ANIMATION_INTERVAL = 100;
+    private final int RECORDING_DELAY = 4500;
+
+    final int RECORDING_TIME = 500; //ms
 
     private AudioRecord recorder;
     private MicrophoneSampleView microphoneSampleView;
@@ -72,7 +68,6 @@ public class RecordingTimer {
 
     public void startRecordingSession() throws Exception {
         animationStart = System.currentTimeMillis();
-        timer.execute(new AudioRecorder());
         microphoneSampleView.startAnimation();
         animationUpdater = new Handler();
         animationUpdater.post(new IntervalAnimationUpdate());
@@ -84,47 +79,39 @@ public class RecordingTimer {
         public void run() {
             try {
                 record();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        private void record() throws IOException {
-            byte[] recordingBuffer = new byte[1000];
-            recorder.startRecording();
-            while (preRecordingPhase()){
-                recorder.read(recordingBuffer, 0, 1000);
-                int average = 0;
-                for (int i=0;i< recordingBuffer.length;i++) {
-                    average += recordingBuffer[i];
-                }
-                currentAmplitude = average/recordingBuffer.length;
-                Log.d("current", ""+currentAmplitude);
-            }
-            recorder.stop();
-            recorder.release();
-
+        private void record() throws IOException, InterruptedException {
             MediaRecorder mediaRecorder = getMediaRecorder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+"recording.mp4");
             mediaRecorder.start();
-            while(runningSession())
-                currentAmplitude = mediaRecorder.getMaxAmplitude();
+            Thread.sleep(RECORDING_TIME);
             mediaRecorder.stop();
             mediaRecorder.release();
-//            Button sendFileButton = (Button) findViewById(R.id.sendButton);
+
         }
     }
 
     private class IntervalAnimationUpdate implements Runnable {
+        private int progress = 0;
 
         @Override
         public void run() {
-            microphoneSampleView.updateAnimation(currentAmplitude);
-            if(runningSession()) {
+            microphoneSampleView.updateAnimation(2);
+            if(runningSession())
                 animationUpdater.postDelayed(this, ANIMATION_INTERVAL);
-            } else{
+            if(startRecording())
+                timer.execute(new AudioRecorder());
+            if(!runningSession())
                 microphoneSampleView.stopAnimation();
-            }
         }
+    }
+
+    private boolean startRecording(){
+        long timePassed = System.currentTimeMillis() - animationStart;
+        return timePassed > RECORDING_DELAY;
     }
 
     private boolean runningSession (){

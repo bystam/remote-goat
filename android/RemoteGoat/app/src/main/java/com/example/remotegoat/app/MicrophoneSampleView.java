@@ -1,25 +1,7 @@
 package com.example.remotegoat.app;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
+import android.widget.ProgressBar;
 
 /**
  * Created by jensa on 17/05/2014.
@@ -27,11 +9,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class MicrophoneSampleView {
     int amplitude = 0;
     int xCoord = 0;
-    SurfaceView view;
+    ProgressBar view;
     static boolean animationRunning = false;
 
     //Constructor that is called when inflating a view from XML.
-    public MicrophoneSampleView(SurfaceView output){
+    public MicrophoneSampleView(ProgressBar output){
         view = output;
     }
 
@@ -41,16 +23,11 @@ public class MicrophoneSampleView {
     }
 
     public void updateAnimation(int amplitude){
-        this.amplitude = amplitude*20;
-        xCoord++;
-        Point next = new Point(xCoord + 150, amplitude + 100);
-        Point reverse = new Point(xCoord + 150, -amplitude + 100);
+        view.incrementProgressBy(amplitude);
     }
 
     public void stopAnimation(){
-        Log.d("JORR", "Stopping animation");
-        animationRunning = false;
-        xCoord = 0;
+        view.setProgress(0);
     }
 
 //    @Override
