@@ -28,7 +28,6 @@ public class MainActivity extends Activity {
         TextView instrumentTitle = (TextView) findViewById(R.id.instrument_name);
         instrumentTitle.setTypeface(font);
         Button recordingButton = (Button) findViewById(R.id.recordButton);
-        recordingButton.setBackgroundColor(getResources().getColor(R.color.dark_grey));
         recordingButton.setTypeface(font);
         int titleId = getResources().getIdentifier("action_bar_title", "id",
                 "android");
@@ -44,7 +43,6 @@ public class MainActivity extends Activity {
         });
 
         Button sendFileButton = (Button) findViewById(R.id.sendButton);
-        sendFileButton.setBackgroundColor(getResources().getColor(R.color.dark_grey));
         sendFileButton.setTypeface(font);
         sendFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
