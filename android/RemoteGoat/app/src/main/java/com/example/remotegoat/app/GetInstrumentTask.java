@@ -2,6 +2,7 @@ package com.example.remotegoat.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
@@ -43,23 +44,19 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String response) {
         Context context = activity.getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
-        CharSequence name;
+        String name;
         if (response == null) {
             //TODO: Somehow close the app or something who knows??!?!
-            name = "Could not establish a connection";
+            Log.d("Instrument response", "Null");
             return;
         } else {
             name = response;
         }
         try {
-            JSONObject jObject = new JSONObject(name.toString());
+            JSONObject jObject = new JSONObject(name);
             name = jObject.getString("name");
             String imagePath = jObject.getString("img");
-            ImageView instrumentImage = (ImageView) activity.findViewById(R.id.instrument_image);
-            ImageLoader imageLoader = ImageLoader.getInstance();
-            imageLoader.displayImage(hostname + imagePath, instrumentImage);
-            TextView instrumentTitle = (TextView) activity.findViewById(R.id.instrument_name);
-            instrumentTitle.setText(name.toString());
+            updateGUI(name, imagePath);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -67,5 +64,15 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         Toast toast = Toast.makeText(context, name, duration);
         toast.show();
         Log.d("Instrument response", name.toString());
+    }
+
+    private void updateGUI(String name, String imagePath) {
+        ImageView instrumentImage = (ImageView) activity.findViewById(R.id.instrument_image);
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        imageLoader.displayImage(hostname + imagePath, instrumentImage);
+        TextView instrumentTitle = (TextView) activity.findViewById(R.id.instrument_name);
+        Typeface font = Typeface.createFromAsset(activity.getAssets(), "8-BIT WONDER.TTF");
+        instrumentTitle.setTypeface(font);
+        instrumentTitle.setText(name);
     }
 }

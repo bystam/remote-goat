@@ -2,6 +2,7 @@ package com.example.remotegoat.app;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -24,7 +25,9 @@ public class MainActivity extends Activity {
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
         TextView micDebug = (TextView)findViewById(R.id.micDebug);
         micSampleView = new MicrophoneSampleView(micDebug);
+        Typeface font = Typeface.createFromAsset(getAssets(), "8-BIT WONDER.TTF");
         Button recordingButton = (Button) findViewById(R.id.recordButton);
+        recordingButton.setTypeface(font);
 
         recordingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -34,6 +37,7 @@ public class MainActivity extends Activity {
         });
 
         Button sendFileButton = (Button) findViewById(R.id.sendButton);
+        sendFileButton.setTypeface(font);
         sendFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
