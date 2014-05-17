@@ -86,7 +86,7 @@ public:
 private:
 	std::mutex _traceMutex;
 	std::list<String> _trace;
-	const int _traceCount = 10;
+	const int _traceCount = 20;
 	RepaintTimer* _repaintTimer;
 
 	std::map<String, Sample> _samples;
