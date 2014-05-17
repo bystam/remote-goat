@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/recordButton"
         android:textColor="@android:color/white"
+        android:background="@drawable/button_custom"
         android:text="@string/recordButton"/>
     <com.example.remotegoat.app.MicrophoneSampleView
         android:id="@+id/micSample"
@@ -36,6 +37,7 @@
         android:textColor="@android:color/white"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/button_custom"
         android:id="@+id/sendButton"
         android:text="@string/sendButton"
         />
