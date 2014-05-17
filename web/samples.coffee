@@ -5,9 +5,7 @@ exports.setupAppForSamples = (app) ->
 
 
 uploadSample = (req, res) ->
-  for key, value of req
-    console.log "#{key} = #{value}"
-  ###
+  console.log req.body
   return
   fs.readFile req.files.displayImage.path, (err, data) ->
     if err
@@ -17,6 +15,5 @@ uploadSample = (req, res) ->
     res.json { status: 'file received' }
     fs.writeFile newPath, data, (err) ->
       console.log 'file upload error #{err}'
-  ###
 
 console.log 'app is set up for sample uploading'
