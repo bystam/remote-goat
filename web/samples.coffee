@@ -12,6 +12,8 @@ uploadSample = (req, res) ->
     if err?
       return console.log '#{err}'
     console.log 'LJUD ACUALLY IS SAVED'
+	
+
 
 console.log 'app is set up for sample uploading'
 
