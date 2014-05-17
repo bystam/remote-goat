@@ -10,22 +10,127 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <map>
 
 class RepaintTimer : public juce::Timer
 {
 private:
-	RemoteGoatVstAudioProcessor* processor;
+	RemoteGoatVstAudioProcessor* _processor;
 
 public:
-	RepaintTimer(RemoteGoatVstAudioProcessor* processor) : processor(processor)
+	RepaintTimer(RemoteGoatVstAudioProcessor* processor) : _processor(processor)
 	{
 		this->startTimer(16);
 	}
 
 	virtual void timerCallback()
 	{
-		auto* ed = processor->getActiveEditor();
+		auto* ed = _processor->getActiveEditor();
 		if (ed != nullptr) ed->repaint();
+	}
+};
+
+class Sample
+{
+private:
+	RemoteGoatVstAudioProcessor* _processor;
+	String _name;
+	AudioSampleBuffer _buffers[2];
+	int _offsets[2];
+	int _bufferIndex;
+	Time _lastModification;
+
+public:
+	const char* EXT = ".wav";
+	const char* WILDCARD = "*.wav";
+
+	Sample()
+	{
+	}
+
+	Sample(RemoteGoatVstAudioProcessor* processor, const String& name)
+		: _processor(processor),
+		_name(name),
+		_bufferIndex(0),
+		_lastModification(0)
+	{
+		memset(_offsets, 0, sizeof(_offsets));
+	}
+
+	// Read <path>/<_name><EXT> and store it in the backbuffer.
+	void update(const String& path, WavAudioFormat& wavAudioFormat)
+	{
+		// Find audio file.
+		String fileName(path);
+		fileName = File::addTrailingSeparator(fileName);
+		fileName += _name;
+		fileName += EXT;
+		File file(fileName);
+
+		Time modification = file.getLastModificationTime();
+		if (modification <= _lastModification)
+			return;
+		_lastModification = modification;
+		_processor->writeTrace(String() << "Updating " << _name);
+
+		// Read audio file. We only read the left channel, mono is good enough.
+		FileInputStream* stream = file.createInputStream();
+		AudioFormatReader* reader = wavAudioFormat.createReaderFor(stream, true);
+		int newIndex = !_bufferIndex;
+		AudioSampleBuffer* buffer = &(_buffers[newIndex]);
+		buffer->setSize(1, reader->lengthInSamples);
+		reader->read(buffer, 0, (int)reader->lengthInSamples, 0, true, false);
+
+		// Done.
+		swap();
+	}
+
+	// Read <n> samples from frontbuffer into <buffer>. Ish. TODO
+	void read()
+	{
+		// TODO: Check if frontbuffer is empty.
+	}
+
+private:
+	void swap()
+	{
+		_offsets[!_bufferIndex] = 0; // Start from beginning of backbuffer.
+		_bufferIndex = !_bufferIndex; // Swap buffers atomically.
+	}
+};
+
+class FilesystemTimer : public juce::Timer
+{
+private:
+	RemoteGoatVstAudioProcessor* _processor;
+	int _period;
+	WavAudioFormat _wavAudioFormat;
+
+public:
+	FilesystemTimer(RemoteGoatVstAudioProcessor* processor) :
+		_processor(processor),
+		_period(200),
+		_wavAudioFormat()
+	{
+		this->startTimer(_period);
+	}
+
+	virtual void timerCallback()
+	{
+		this->stopTimer();
+
+		// Poll sample directory.
+		String path = File::getSpecialLocation(File::SpecialLocationType::userHomeDirectory)
+			.getFullPathName();
+		path = File::addTrailingSeparator(path);
+		path += ".remote-goat";
+		
+		for (const String& sampleName : SAMPLE_NAMES)
+		{
+			_processor->getSample(sampleName).update(path, _wavAudioFormat);
+		}
+
+		this->startTimer(_period);
 	}
 };
 
@@ -33,8 +138,17 @@ public:
 RemoteGoatVstAudioProcessor::RemoteGoatVstAudioProcessor()
 {
 	writeTrace("Goat Trace!");
+
 	_repaintTimer = new RepaintTimer(this);
-	_play = false;
+	
+	for (const String& sampleName : SAMPLE_NAMES)
+	{
+		_samples[sampleName] = Sample(this, sampleName);
+	}
+
+	_filesystemTimer = new FilesystemTimer(this);
+
+	_play = false; 
 }
 
 RemoteGoatVstAudioProcessor::~RemoteGoatVstAudioProcessor()
@@ -193,15 +307,17 @@ void RemoteGoatVstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
 	buffer.clear(1, 0, buffer.getNumSamples());
 
 	static long long t = 0;
-	static double pi = std::cos(0) * 2;
+	const double pi = std::cos(0) * 2;
 	double sampleRate = this->getSampleRate();
 	float* left = buffer.getWritePointer(0);
 	float* right = buffer.getWritePointer(1);
-	double x = 2 * pi * 1 / (sampleRate / _frequency);
 	for (int i = 0; i < buffer.getNumSamples(); ++i)
 	{
-		if (_play)
-			left[i] = right[i] = sin(x * t);
+		//if (_play)
+		//{
+		//	double x = 2 * pi * 1 / (sampleRate / _frequency);
+		//	left[i] = right[i] = sin(x * t);
+		//}
 		++t;
 	}
 
@@ -268,6 +384,11 @@ void RemoteGoatVstAudioProcessor::writeTrace(const String& line)
 			_trace.pop_front();
 	}
 	_traceMutex.unlock();
+}
+
+Sample& RemoteGoatVstAudioProcessor::getSample(const String& sampleName)
+{
+	return _samples[sampleName];
 }
 
 //==============================================================================

@@ -14,8 +14,13 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <list>
 #include <mutex>
+#include <map>
 
 class RepaintTimer;
+class Sample;
+class FilesystemTimer;
+
+char* const SAMPLE_NAMES[11] = { "BD", "CB", "CH", "CP", "CY", "HT", "LT", "MT", "OH", "RS", "SD" };
 
 //==============================================================================
 /**
@@ -74,12 +79,16 @@ public:
 	std::list<String> getTrace();
 	const int getTraceCountMaximum() const;
 	void writeTrace(const String& line);
+
+	Sample& getSample(const String& sampleName);
 private:
 	std::mutex _traceMutex;
 	std::list<String> _trace;
 	const int _traceCount = 10;
 	RepaintTimer* _repaintTimer;
 
+	std::map<String, Sample> _samples;
+	FilesystemTimer* _filesystemTimer;
 	bool _play;
 	int _lastNote;
 	double _frequency;
