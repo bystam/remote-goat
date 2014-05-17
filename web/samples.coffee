@@ -1,8 +1,7 @@
 fs = require 'node-fs'
-multipart = (require 'connect-multiparty')() # middleware
 
 exports.setupAppForSamples = (app) ->
-  app.post '/sample', multipart, uploadSample
+  app.post '/sample', uploadSample
 
 
 uploadSample = (req, res) ->
