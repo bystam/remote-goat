@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import android.os.Handler;
+import android.widget.Button;
 
 /**
  * Created by jensa on 17/05/2014.
@@ -109,6 +110,7 @@ public class RecordingTimer {
                 currentAmplitude = mediaRecorder.getMaxAmplitude();
             mediaRecorder.stop();
             mediaRecorder.release();
+//            Button sendFileButton = (Button) findViewById(R.id.sendButton);
         }
     }
 

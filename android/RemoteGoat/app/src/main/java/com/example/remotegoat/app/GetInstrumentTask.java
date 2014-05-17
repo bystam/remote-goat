@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,7 +24,7 @@ import java.net.URL;
  */
 public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
-    private String hostname = "http://192.168.43.6/";
+    private String hostname = "http://192.168.43.218/";
     private Activity activity;
 
     public static String instrumentColor;
@@ -72,6 +73,10 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
     }
 
     private void updateGUI(String name, String imagePath, String colorHex) {
+        Button recordingButton = (Button) activity.findViewById(R.id.recordButton);
+        recordingButton.setVisibility(View.VISIBLE);
+        Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
+        sendFileButton.setVisibility(View.VISIBLE);
         ImageView instrumentImage = (ImageView) activity.findViewById(R.id.instrument_image);
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(hostname + imagePath, instrumentImage);
