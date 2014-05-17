@@ -2,11 +2,13 @@ exports.appAndServerWithJade = ->
   express = require 'express'
   http = require 'http'
   bodyparser = require 'body-parser'
+  connect = require 'connect'
 
   app = express()
         .use express.static(__dirname + '/public')
         .use (require 'morgan')() # logger
         .use bodyparser()
+        .use connect.methodOverride()
         .set 'view engine', 'jade'
         .set 'views', __dirname + '/views'
 
