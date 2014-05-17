@@ -2,6 +2,7 @@ exports.appAndServerWithJade = ->
   express = require 'express'
   http = require 'http'
   bodyparser = require 'body-parser'
+  midi = require 'midi'
 
   app = express()
         .use express.static(__dirname + '/public')
