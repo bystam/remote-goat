@@ -1,12 +1,12 @@
 /*
   ==============================================================================
 
-    This file was auto-generated!
+  This file was auto-generated!
 
-    It contains the basic startup code for a Juce application.
+  It contains the basic startup code for a Juce application.
 
   ==============================================================================
-*/
+  */
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -150,7 +150,7 @@ public:
 			.getFullPathName();
 		path = File::addTrailingSeparator(path);
 		path += ".remote-goat";
-		
+
 		for (const String& sampleName : SAMPLE_NAMES)
 		{
 			_processor->getSample(sampleName).update(path, _wavAudioFormat);
@@ -166,7 +166,7 @@ RemoteGoatVstAudioProcessor::RemoteGoatVstAudioProcessor()
 	writeTrace("Goat Trace!");
 
 	_repaintTimer = new RepaintTimer(this);
-	
+
 	for (const String& sampleName : SAMPLE_NAMES)
 	{
 		_samples[sampleName] = Sample(this, sampleName);
@@ -191,113 +191,113 @@ const String RemoteGoatVstAudioProcessor::getName() const
 
 int RemoteGoatVstAudioProcessor::getNumParameters()
 {
-    return 0;
+	return 0;
 }
 
-float RemoteGoatVstAudioProcessor::getParameter (int index)
+float RemoteGoatVstAudioProcessor::getParameter(int index)
 {
-    return 0.0f;
+	return 0.0f;
 }
 
-void RemoteGoatVstAudioProcessor::setParameter (int index, float newValue)
+void RemoteGoatVstAudioProcessor::setParameter(int index, float newValue)
 {
 }
 
-const String RemoteGoatVstAudioProcessor::getParameterName (int index)
+const String RemoteGoatVstAudioProcessor::getParameterName(int index)
 {
-    return String::empty;
+	return String::empty;
 }
 
-const String RemoteGoatVstAudioProcessor::getParameterText (int index)
+const String RemoteGoatVstAudioProcessor::getParameterText(int index)
 {
-    return String::empty;
+	return String::empty;
 }
 
-const String RemoteGoatVstAudioProcessor::getInputChannelName (int channelIndex) const
+const String RemoteGoatVstAudioProcessor::getInputChannelName(int channelIndex) const
 {
-    return String (channelIndex + 1);
+	return String(channelIndex + 1);
 }
 
-const String RemoteGoatVstAudioProcessor::getOutputChannelName (int channelIndex) const
+const String RemoteGoatVstAudioProcessor::getOutputChannelName(int channelIndex) const
 {
-    return String (channelIndex + 1);
+	return String(channelIndex + 1);
 }
 
-bool RemoteGoatVstAudioProcessor::isInputChannelStereoPair (int index) const
+bool RemoteGoatVstAudioProcessor::isInputChannelStereoPair(int index) const
 {
-    return true;
+	return true;
 }
 
-bool RemoteGoatVstAudioProcessor::isOutputChannelStereoPair (int index) const
+bool RemoteGoatVstAudioProcessor::isOutputChannelStereoPair(int index) const
 {
-    return true;
+	return true;
 }
 
 bool RemoteGoatVstAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
-    return false;
-   #endif
+#if JucePlugin_WantsMidiInput
+	return true;
+#else
+	return false;
+#endif
 }
 
 bool RemoteGoatVstAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
-    return false;
-   #endif
+#if JucePlugin_ProducesMidiOutput
+	return true;
+#else
+	return false;
+#endif
 }
 
 bool RemoteGoatVstAudioProcessor::silenceInProducesSilenceOut() const
 {
-    return false;
+	return false;
 }
 
 double RemoteGoatVstAudioProcessor::getTailLengthSeconds() const
 {
-    return 0.0;
+	return 0.0;
 }
 
 int RemoteGoatVstAudioProcessor::getNumPrograms()
 {
-    return 0;
+	return 0;
 }
 
 int RemoteGoatVstAudioProcessor::getCurrentProgram()
 {
-    return 0;
+	return 0;
 }
 
-void RemoteGoatVstAudioProcessor::setCurrentProgram (int index)
+void RemoteGoatVstAudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const String RemoteGoatVstAudioProcessor::getProgramName (int index)
+const String RemoteGoatVstAudioProcessor::getProgramName(int index)
 {
-    return String::empty;
+	return String::empty;
 }
 
-void RemoteGoatVstAudioProcessor::changeProgramName (int index, const String& newName)
+void RemoteGoatVstAudioProcessor::changeProgramName(int index, const String& newName)
 {
 }
 
 //==============================================================================
-void RemoteGoatVstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void RemoteGoatVstAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+	// Use this method as the place to do any pre-playback
+	// initialisation that you need..
 }
 
 void RemoteGoatVstAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+	// When playback stops, you can use this as an opportunity to free up any
+	// spare memory, etc.
 }
 
-void RemoteGoatVstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
 	if (!midiMessages.isEmpty())
 	{
@@ -375,27 +375,27 @@ void RemoteGoatVstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
 //==============================================================================
 bool RemoteGoatVstAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+	return true; // (change this to false if you choose to not supply an editor)
 }
 
 AudioProcessorEditor* RemoteGoatVstAudioProcessor::createEditor()
 {
 	writeTrace("Create editor");
-    return new RemoteGoatVstAudioProcessorEditor (this);
+	return new RemoteGoatVstAudioProcessorEditor(this);
 }
 
 //==============================================================================
-void RemoteGoatVstAudioProcessor::getStateInformation (MemoryBlock& destData)
+void RemoteGoatVstAudioProcessor::getStateInformation(MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+	// You should use this method to store your parameters in the memory block.
+	// You could do that either as raw data, or use the XML or ValueTree classes
+	// as intermediaries to make it easy to save and load complex data.
 }
 
-void RemoteGoatVstAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void RemoteGoatVstAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+	// You should use this method to restore your parameters from this memory block,
+	// whose contents will have been created by the getStateInformation() call.
 }
 
 //==============================================================================
@@ -444,5 +444,5 @@ Sample& RemoteGoatVstAudioProcessor::getSample(const String& sampleName)
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new RemoteGoatVstAudioProcessor();
+	return new RemoteGoatVstAudioProcessor();
 }
