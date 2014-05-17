@@ -17,6 +17,7 @@ public class MainActivity extends Activity {
 
     private MicrophoneSampleView micSampleView;
     private FilesystemRecorder filesystemRecorder = new FilesystemRecorder();
+    public static String instrumentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class MainActivity extends Activity {
     private void startRecording (){
         Log.d("STARTING", "starting recording sesh");
         try {
-            new RecordingTimer(micSampleView, filesystemRecorder).startRecordingSession();
+            new RecordingTimer(micSampleView, filesystemRecorder, this).startRecordingSession();
         } catch (Exception e) {
             e.printStackTrace();
         }

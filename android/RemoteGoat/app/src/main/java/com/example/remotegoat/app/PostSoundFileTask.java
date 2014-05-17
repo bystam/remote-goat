@@ -69,8 +69,11 @@ public class PostSoundFileTask extends AsyncTask<String, Void, String> {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         builder.addPart("audiofile", fileBody);
+        GoatApplication goat = (GoatApplication) activity.getApplication();
+        String instrumentId = goat.getInstrumentId();
+        
         try {
-            builder.addPart("id", new StringBody("BD"));
+            builder.addPart("id", new StringBody(instrumentId));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

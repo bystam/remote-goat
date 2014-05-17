@@ -1,14 +1,15 @@
 package com.example.remotegoat.app;
 
-import android.graphics.Color;
+import android.app.Activity;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.os.Handler;
+import android.widget.Button;
+
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import android.os.Handler;
 
 /**
  * Created by jensa on 17/05/2014.
@@ -35,9 +36,12 @@ public class RecordingTimer {
     private long animationStart;
 
     private int currentAmplitude;
+    private Activity activity;
 
 
-    public RecordingTimer(MicrophoneSampleView micSampleView, FilesystemRecorder filesystemRecorder){
+    public RecordingTimer(MicrophoneSampleView micSampleView, FilesystemRecorder filesystemRecorder,
+                          Activity activity){
+        this.activity = activity;
         timer = new ScheduledThreadPoolExecutor(2);
         this.recorder = getAudioRecorder();
         this.filesystemRecorder = filesystemRecorder;
@@ -90,7 +94,8 @@ public class RecordingTimer {
             Thread.sleep(RECORDING_TIME);
             mediaRecorder.stop();
             mediaRecorder.release();
-
+            Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
+            sendFileButton.setEnabled(true);
         }
     }
 

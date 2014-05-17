@@ -9,6 +9,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
  * Created by SexOffender01 on 2014-05-17.
  */
 public class GoatApplication extends Application {
+    private String instrumentId;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -17,5 +19,13 @@ public class GoatApplication extends Application {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
         .build();
         ImageLoader.getInstance().init(config);
+    }
+
+    public void setInstrumentId(String instrumentId){
+        this.instrumentId = instrumentId;
+    }
+
+    public String getInstrumentId() {
+        return instrumentId;
     }
 }
