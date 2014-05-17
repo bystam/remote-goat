@@ -5,4 +5,6 @@ exports.setupAppForInstruments = (app) ->
   console.log 'app is now set up for instruments :D'
 
   app.get '/instruments', (req, res) ->
-  	res.json({ instrID: instruments[i = (i++%instruments.length)]})
+  	if i is instruments.length - 1
+  		i = -1
+  	res.json({ instrID: instruments[++i]})
