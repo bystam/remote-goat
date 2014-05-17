@@ -12,7 +12,10 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include <list>
+#include <mutex>
 
+class RepaintTimer;
 
 //==============================================================================
 /**
@@ -65,6 +68,17 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData);
     void setStateInformation (const void* data, int sizeInBytes);
+
+	//==============================================================================
+	const String getHelloWorld() const;
+	std::list<String> getTrace();
+	const int getTraceCountMaximum() const;
+	void writeTrace(const String& line);
+private:
+	std::mutex _traceMutex;
+	std::list<String> _trace;
+	const int _traceCount = 10;
+	RepaintTimer* _repaintTimer;
 
 private:
     //==============================================================================

@@ -27,6 +27,10 @@ public:
     //==============================================================================
     // This is just a standard Juce paint method...
     void paint (Graphics& g);
+
+	//==============================================================================
+protected:
+	RemoteGoatVstAudioProcessor* getAudioProcessorTyped() const;
 };
 
 

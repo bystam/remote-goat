@@ -11,20 +11,40 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+class RepaintTimer : public juce::Timer
+{
+private:
+	RemoteGoatVstAudioProcessor* processor;
+
+public:
+	RepaintTimer(RemoteGoatVstAudioProcessor* processor) : processor(processor)
+	{
+		this->startTimer(16);
+	}
+
+	virtual void timerCallback()
+	{
+		auto* ed = processor->getActiveEditor();
+		if (ed != nullptr) ed->repaint();
+	}
+};
 
 //==============================================================================
 RemoteGoatVstAudioProcessor::RemoteGoatVstAudioProcessor()
 {
+	writeTrace("Goat Trace!");
+	_repaintTimer = new RepaintTimer(this);
 }
 
 RemoteGoatVstAudioProcessor::~RemoteGoatVstAudioProcessor()
 {
+	delete _repaintTimer;
 }
 
 //==============================================================================
 const String RemoteGoatVstAudioProcessor::getName() const
 {
-    return JucePlugin_Name;
+	return JucePlugin_Name;
 }
 
 int RemoteGoatVstAudioProcessor::getNumParameters()
@@ -137,22 +157,32 @@ void RemoteGoatVstAudioProcessor::releaseResources()
 
 void RemoteGoatVstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    for (int channel = 0; channel < getNumInputChannels(); ++channel)
-    {
-        float* channelData = buffer.getWritePointer (channel);
+	//if (midiMessages.data.size() > 0)
+	if (0)
+	{
+		String trace;
+		trace << "Process block, "
+			<< buffer.getNumSamples() << " samples, "
+			<< midiMessages.data.size() << " MIDI";
+		writeTrace(trace);
+	}
 
-        // ..do something to the data...
-    }
+	buffer.clear(0, 0, buffer.getNumSamples());
+	buffer.clear(1, 0, buffer.getNumSamples());
 
-    // In case we have more outputs than inputs, we'll clear any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
-    {
-        buffer.clear (i, 0, buffer.getNumSamples());
-    }
+	static long long t = 0;
+	static double pi = std::cos(0) * 2;
+	double sampleRate = this->getSampleRate();
+	float* left = buffer.getWritePointer(0);
+	float* right = buffer.getWritePointer(1);
+	double x = 2 * pi * 1 / (sampleRate / 440);
+	for (int i = 0; i < buffer.getNumSamples(); ++i)
+	{
+		left[i] = right[i] = sin(x * t);
+		++t;
+	}
+
+	midiMessages.clear();
 }
 
 //==============================================================================
@@ -163,6 +193,7 @@ bool RemoteGoatVstAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* RemoteGoatVstAudioProcessor::createEditor()
 {
+	writeTrace("Create editor");
     return new RemoteGoatVstAudioProcessorEditor (this);
 }
 
@@ -178,6 +209,43 @@ void RemoteGoatVstAudioProcessor::setStateInformation (const void* data, int siz
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+//==============================================================================
+const String RemoteGoatVstAudioProcessor::getHelloWorld() const
+{
+	return "Hello Goat!";
+}
+
+std::list<String> RemoteGoatVstAudioProcessor::getTrace()
+{
+	_traceMutex.lock();
+	std::list<String> traceCopy(_trace);
+	_traceMutex.unlock();
+	return traceCopy;
+}
+
+const int RemoteGoatVstAudioProcessor::getTraceCountMaximum() const
+{
+	return _traceCount;
+}
+
+void RemoteGoatVstAudioProcessor::writeTrace(const String& line)
+{
+	auto time = Time::getCurrentTime();
+	String traceLine;
+	traceLine << "[" << time.toString(false, true, true, true)
+		<< ":" << time.getMilliseconds()
+		<< "] " << line;
+
+	_traceMutex.lock();
+	{
+		_trace.push_back(traceLine);
+
+		if (_trace.size() > getTraceCountMaximum())
+			_trace.pop_front();
+	}
+	_traceMutex.unlock();
 }
 
 //==============================================================================

@@ -11,7 +11,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-
 //==============================================================================
 RemoteGoatVstAudioProcessorEditor::RemoteGoatVstAudioProcessorEditor (RemoteGoatVstAudioProcessor* ownerFilter)
     : AudioProcessorEditor (ownerFilter)
@@ -30,7 +29,22 @@ void RemoteGoatVstAudioProcessorEditor::paint (Graphics& g)
     g.fillAll (Colours::white);
     g.setColour (Colours::black);
     g.setFont (15.0f);
-    g.drawFittedText ("Hello World!",
-                      0, 0, getWidth(), getHeight(),
-                      Justification::centred, 1);
+
+	// Get audio processor.
+	auto* pu = getAudioProcessorTyped();
+
+	// Write trace lines.
+	const auto& trace = pu->getTrace();
+	int i = 0;
+	for (const String& line : trace)
+	{
+		g.drawText (line, 0, i * 15, getWidth(), 15, Justification::left, true);
+		++i;
+	}
+}
+
+//==============================================================================
+RemoteGoatVstAudioProcessor* RemoteGoatVstAudioProcessorEditor::getAudioProcessorTyped() const
+{
+	return (RemoteGoatVstAudioProcessor*)getAudioProcessor();
 }
