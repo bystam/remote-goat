@@ -112,7 +112,7 @@ void Sample::noteOff()
 
 int64 Sample::getMsecSinceLoad() const
 {
-	return (Time::currentTimeMillis() - _lastModification.currentTimeMillis());
+	return (Time::currentTimeMillis() - _lastModification.toMilliseconds());
 }
 
 int64 Sample::getMsecSinceNoteOn() const

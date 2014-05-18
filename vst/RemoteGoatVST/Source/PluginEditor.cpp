@@ -63,19 +63,29 @@ void RemoteGoatVstAudioProcessorEditor::paint(Graphics& g)
 	const float innerRadius = 75;
 	const float borderThickness = 3;
 	g.setFont(innerRadius / 2);
+	const float loadShineTime = 3000;
 	for (int i = 0; i < noteCount; ++i)
 	{
+		const Sample& sample = pu->getSample(SAMPLE_NAMES[i]);
 		float cx = WIDTH / 2 + radius * cos(theta),
 			cy = HEIGHT / 2 + radius * sin(theta);
-		pu->writeTrace(String() << "Ellipse at " << cx << "," << cy);
+
+		Colour colour((float)((theta - thetaStart) / twoPi), 1.0f, 1.0f, (uint8)0xFF);
+		bool loadShine = sample.getMsecSinceLoad() < loadShineTime;
+		float loadness = (loadShineTime - sample.getMsecSinceLoad()) / loadShineTime;
+		if (loadShine)
+		{
+			pu->writeTrace(String() << "" << (int) sample.getMsecSinceLoad());
+			colour = colour.interpolatedWith(Colours::white, loadness);
+		}
+
 		Rectangle<float> rect(cx - innerRadius / 2, cy - innerRadius / 2,
 			innerRadius, innerRadius);
-		Colour colour((float)((theta - thetaStart) / twoPi), 1.0f, 1.0f, (uint8)0xFF);
+
 		g.setColour(colour);
-		g.drawEllipse(rect, borderThickness);
+		g.drawEllipse(rect, (!loadShine) ? borderThickness : (1 + 3 * loadness) * borderThickness);
 		g.setColour(Colours::white);
 
-		const Sample& sample = pu->getSample(SAMPLE_NAMES[i]);
 		if (sample.isAlive())
 		{
 			g.setColour(colour);
