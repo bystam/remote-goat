@@ -2,8 +2,18 @@ package com.example.remotegoat.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,18 +23,21 @@ import java.net.URL;
  */
 public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
-    private final String hostname = "http://jensarvidsson.se/";
+    private String hostname;
     private Activity activity;
 
-    public GetInstrumentTask(Activity activity) {
+    public static String instrumentColor;
+
+    public GetInstrumentTask(Activity activity, String host) {
         this.activity = activity;
+        this.hostname = host;
     }
 
     @Override
     protected String doInBackground(String... params) {
         URL url = null;
         try {
-            url = new URL(hostname);
+            url = new URL(hostname+"instruments");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -33,21 +46,48 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String response) {
+        Context context = activity.getApplicationContext();
+        String name;
         if (response == null) {
             //TODO: Somehow close the app or something who knows??!?!
+            Log.d("Instrument response", "Null");
+            return;
+        } else {
+            name = response;
         }
-        //TODO: Call class that creates gui here
-        Context context = activity.getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-        CharSequence text;
-        if (response.startsWith("False")){
-            text = "Post failed";
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }else {
-            text = response;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+        try {
+            JSONObject jObject = new JSONObject(name);
+            String id = jObject.getString("id");
+            GoatApplication goat = (GoatApplication) activity.getApplication();
+            goat.setInstrumentId(id);
+            name = jObject.getString("name");
+            String imagePath = jObject.getString("img");
+            String colorHex = jObject.getString("color");
+            instrumentColor = colorHex;
+            updateGUI(name, imagePath, colorHex);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        Log.d("Instrument response", name.toString());
+    }
+
+    private void updateGUI(String name, String imagePath, String colorHex) {
+        Button recordingButton = (Button) activity.findViewById(R.id.recordButton);
+        recordingButton.setVisibility(View.VISIBLE);
+        Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
+        sendFileButton.setVisibility(View.VISIBLE);
+        ImageView instrumentImage = (ImageView) activity.findViewById(R.id.instrument_image);
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        imageLoader.displayImage(hostname + imagePath, instrumentImage);
+        TextView instrumentTitle = (TextView) activity.findViewById(R.id.instrument_name);
+        instrumentTitle.setText(name);
+        View mainView = activity.getWindow().getDecorView();
+        mainView.setBackgroundColor(Color.parseColor(colorHex));
+        instrumentImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new GetInstrumentTask(activity, hostname).execute();
+            }
+        });
     }
 }
