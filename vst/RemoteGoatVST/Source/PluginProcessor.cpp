@@ -58,10 +58,12 @@ void Sample::update(const String& path, WavAudioFormat& wavAudioFormat)
 	Time modification = file.getLastModificationTime();
 	if (modification <= _lastModification)
 		return;
-	_lastModification = modification;
 
 	// Read audio file. We only read the left channel, mono is good enough.
 	AudioFormatReader* reader = wavAudioFormat.createReaderFor(file.createInputStream(), true);
+	if (reader == nullptr)
+		return;
+	_lastModification = modification;
 
 	int64 start = reader->searchForLevel(0, reader->lengthInSamples, SAMPLE_START_THRESHOLD, 1.0, 0);
 	if (start == -1)
