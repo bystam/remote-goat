@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -24,13 +23,14 @@ import java.net.URL;
  */
 public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
-    private String hostname = "http://192.168.43.218/";
+    private String hostname;
     private Activity activity;
 
     public static String instrumentColor;
 
-    public GetInstrumentTask(Activity activity) {
+    public GetInstrumentTask(Activity activity, String host) {
         this.activity = activity;
+        this.hostname = host;
     }
 
     @Override
@@ -47,7 +47,6 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String response) {
         Context context = activity.getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
         String name;
         if (response == null) {
             //TODO: Somehow close the app or something who knows??!?!
@@ -69,9 +68,6 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        Toast toast = Toast.makeText(context, name, duration);
-        toast.show();
         Log.d("Instrument response", name.toString());
     }
 
@@ -90,7 +86,7 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         instrumentImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new GetInstrumentTask(activity).execute();
+                new GetInstrumentTask(activity, hostname).execute();
             }
         });
     }

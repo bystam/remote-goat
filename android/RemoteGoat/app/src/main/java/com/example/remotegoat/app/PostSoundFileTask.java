@@ -27,11 +27,12 @@ import java.io.UnsupportedEncodingException;
  */
 public class PostSoundFileTask extends AsyncTask<String, Void, String> {
 
-    private final String hostname = "http://192.168.43.218/";
+    private final String hostname;
     private Activity activity;
 
-    public PostSoundFileTask(Activity activity) {
+    public PostSoundFileTask(Activity activity, String host) {
         this.activity = activity;
+        hostname = host;
     }
 
     @Override

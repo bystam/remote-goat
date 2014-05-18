@@ -20,8 +20,6 @@ public class RecordingTimer {
 
     private static final int RECORDER_SAMPLERATE =  44100;
 
-
-
     private final int TIMER_INTERVAL = 700;
     private final int PRE_RECORD = 300;
 
