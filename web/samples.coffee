@@ -15,7 +15,7 @@ uploadSample = (req, res) ->
     console.log 'LJUD ACUALLY IS SAVED'
     wav.convertToWav newPath, (convertErr) ->
       if convertErr?
-        console.log 'convert error :D'
+        console.log JSON.stringify convertErr
       fs.unlink newPath, (unlinkErr) ->
         if unlinkErr?
           console.log 'unlink file failed'
