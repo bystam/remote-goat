@@ -5,12 +5,14 @@ import android.media.AudioFormat;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
+import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jensa on 17/05/2014.
@@ -26,14 +28,14 @@ public class RecordingTimer {
     private final int SESSION_MILLISECONDS = 2000;
 
 
-    private ProgressBar recordingProgress;
+    private LinearLayout recordingProgress;
     private ScheduledThreadPoolExecutor timer;
     private Handler animationUpdater;
     private long recordingStart;
     private Activity activity;
 
 
-    public RecordingTimer(ProgressBar progress,
+    public RecordingTimer(LinearLayout progress,
                           Activity activity){
         this.activity = activity;
         timer = new ScheduledThreadPoolExecutor(2);
@@ -87,19 +89,42 @@ public class RecordingTimer {
     }
 
     private class IntervalAnimationUpdate implements Runnable {
+        int progress = 0;
 
         @Override
         public void run() {
-            recordingProgress.incrementProgressBy(5);
-            if(!runningSession()){
-                recordingProgress.setProgress(0);
+            progress++;
+            if(progress < 5)
+                writeProgress(progress);
+            if(progress == 3){
+                ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+                executor.schedule(new AudioRecorder(), 700, TimeUnit.MILLISECONDS);
+            }
+            if(progress == 4){
+                TextView fileStatus = (TextView) activity.findViewById(R.id.file_status);
+                fileStatus.setText("RECORDING...");
+            }
+            if(progress == 5){
+                resetProgress();
                 Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
                 sendFileButton.setEnabled(true);
-            } else {
-                animationUpdater.postDelayed(this, 100);
                 TextView fileStatus = (TextView) activity.findViewById(R.id.file_status);
                 fileStatus.setText(activity.getString(R.string.file_ready));
+            } else{
+                animationUpdater.postDelayed(this, 1000);
             }
+        }
+    }
+
+    private void resetProgress() {
+        for (int i = 0; i <recordingProgress.getChildCount() ; i++) {
+            recordingProgress.getChildAt(i).setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void writeProgress(int progress) {
+        for (int i = 0; i < progress ; i++) {
+            recordingProgress.getChildAt(i).setVisibility(View.VISIBLE);
         }
     }
 

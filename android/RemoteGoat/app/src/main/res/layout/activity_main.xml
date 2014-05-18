@@ -37,15 +37,47 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <ProgressBar
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:max="100"
-        android:id="@+id/micSample"
-        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_height="80dp"
+        android:id="@+id/progressLayout"
+        android:layout_centerHorizontal="true"
         android:layout_below="@+id/recordButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:weightSum="1">
+
+    <ImageView
+        android:layout_width="0dp"
+        android:visibility="invisible"
+        android:layout_height="fill_parent"
+        android:id="@+id/imageView"
+        android:src="@drawable/ic_launcher"
+        android:layout_weight="0.25" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:visibility="invisible"
+        android:layout_height="fill_parent"
+        android:src="@drawable/ic_launcher"
+        android:id="@+id/imageView2"
+        android:layout_weight="0.25" />
+
+    <ImageView
+        android:visibility="invisible"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:id="@+id/imageView3"
+        android:src="@drawable/ic_launcher"
+        android:layout_weight="0.25" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:visibility="invisible"
+        android:layout_height="fill_parent"
+        android:src="@drawable/ic_launcher"
+        android:id="@+id/imageView4"
+        android:layout_weight="0.25" />
+    </LinearLayout>
 
     <Button
         android:visibility="visible"
