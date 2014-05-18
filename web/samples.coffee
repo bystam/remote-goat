@@ -11,14 +11,23 @@ uploadSample = (req, res) ->
 
   fs.rename oldPath, newPath, (renameErr) ->
     if renameErr?
+      res.json { err: 'RENAME TO WAV GICK FEL!!!!' }
       return console.log '#{renameErr}'
+
     console.log 'LJUD ACUALLY IS SAVED'
     wav.convertToWav newPath, (convertErr) ->
       if convertErr?
-        console.log JSON.stringify convertErr
+        res.json { err: 'CONVERT TO WAV GICK FEL!!!!' }
+        return console.log '#{convertErr}'
+
+
+      console.log 'WAV ACUALLY IS SAVED'
       fs.unlink newPath, (unlinkErr) ->
         if unlinkErr?
-          console.log 'unlink file failed'
+          res.json { err: 'UNLINK TO WAV GICK FEL!!!!' }
+          return console.log '#{unlinkErr}'
+
+        res.json { string: 'schysst sträng' }
 
 
 console.log 'app is set up for sample uploading'

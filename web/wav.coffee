@@ -9,11 +9,11 @@ exports.convertToWav = (oldPath, callback) ->
 
   command = "ffmpeg -i #{oldPath} -ar 44100 #{wavPath} -y"
 
-
   console.log command
   exec command, (err) ->
   	if err?
   		return console.log JSON.stringify(err)
+
   	goatDir = getGoatDir()
   	newPath = path.resolve goatDir, (base + '.wav')
   	command = "sox #{wavPath} #{newPath} silence 1 0.1 10%"
