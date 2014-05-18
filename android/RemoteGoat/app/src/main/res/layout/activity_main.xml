@@ -42,12 +42,15 @@
         android:max="100"
         android:id="@+id/micSample"
         style="@android:style/Widget.ProgressBar.Horizontal"
-        />
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginLeft="250dp"
-        android:src="@drawable/ic_launcher"/>
+        android:src="@drawable/ic_launcher"
+        android:layout_below="@+id/micSample"
+        android:layout_toRightOf="@+id/instrument_name" />
         android:paddingTop="5dp"
         android:layout_below="@+id/recordButton"
         android:layout_alignParentRight="true"
@@ -69,8 +72,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Helloooo"
+        android:text=""
         android:id="@+id/file_status"
+        android:paddingBottom="10dp"
         android:layout_above="@+id/sendButton"
         android:layout_centerHorizontal="true" />
 

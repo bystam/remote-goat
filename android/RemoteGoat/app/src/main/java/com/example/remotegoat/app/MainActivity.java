@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,6 +28,8 @@ public class MainActivity extends Activity {
         micSampleView = new MicrophoneSampleView(micSampleOutput);
         Typeface font = Typeface.createFromAsset(getAssets(), "8-BIT WONDER.TTF");
         TextView instrumentTitle = (TextView) findViewById(R.id.instrument_name);
+        TextView fileStatus = (TextView) findViewById(R.id.file_status);
+        fileStatus.setTypeface(font);
         instrumentTitle.setTypeface(font);
         Button recordingButton = (Button) findViewById(R.id.recordButton);
         recordingButton.setTypeface(font);

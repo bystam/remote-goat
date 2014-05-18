@@ -63,6 +63,8 @@ public class RecordingTimer {
         recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         recorder.setAudioSamplingRate(RECORDER_SAMPLERATE);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        recorder.setAudioChannels(1);
+        recorder.setAudioEncodingBitRate(44100 * 16);
         recorder.setOutputFile(outputFile);
         try {
             recorder.prepare();
@@ -118,7 +120,7 @@ public class RecordingTimer {
                 Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
                 sendFileButton.setEnabled(true);
                 TextView fileStatus = (TextView) activity.findViewById(R.id.file_status);
-                fileStatus.setText("File ready for upload!");
+                fileStatus.setText(activity.getString(R.string.file_ready));
             }
         }
     }
