@@ -27,7 +27,7 @@ uploadSample = (req, res) ->
           res.json { err: 'UNLINK TO WAV GICK FEL!!!!' }
           return console.log '#{unlinkErr}'
 
-        res.json { string: 'schysst sträng' }
+        res.json { svar_till_dexter: 'tack!' }
 
 
 console.log 'app is set up for sample uploading'
