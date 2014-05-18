@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -22,8 +23,11 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         new GetInstrumentTask(this).execute();
         micSampleOutput =  (ProgressBar) findViewById(R.id.micSample);
+        RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.mainLayout);
         Typeface font = Typeface.createFromAsset(getAssets(), "8-BIT WONDER.TTF");
         TextView instrumentTitle = (TextView) findViewById(R.id.instrument_name);
+        TextView fileStatus = (TextView) findViewById(R.id.file_status);
+        fileStatus.setTypeface(font);
         instrumentTitle.setTypeface(font);
         Button recordingButton = (Button) findViewById(R.id.recordButton);
         recordingButton.setTypeface(font);
@@ -57,13 +61,6 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
     }
 
     @Override

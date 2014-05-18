@@ -8,7 +8,7 @@
             <corners android:bottomLeftRadius="7dp" android:bottomRightRadius="7dp" android:topLeftRadius="7dp" android:topRightRadius="7dp" />
         </shape>
     </item>
-    <item android:state_enabled="false" >
+    <item>
         <shape>
             <stroke android:width="2dp" android:color="#fff" />
 
@@ -16,13 +16,13 @@
             <corners android:bottomLeftRadius="7dp" android:bottomRightRadius="7dp" android:topLeftRadius="7dp" android:topRightRadius="7dp" />
         </shape>
     </item>
-    <item android:state_enabled="true">
-        <shape>
-            <stroke android:width="2dp" android:color="#000" />
+    <!--<item android:state_enabled="true">-->
+        <!--<shape>-->
+            <!--<stroke android:width="2dp" android:color="#000" />-->
 
-            <solid android:color="#333" />
+            <!--<solid android:color="#333" />-->
 
-            <corners android:bottomLeftRadius="7dp" android:bottomRightRadius="7dp" android:topLeftRadius="7dp" android:topRightRadius="7dp" />
-        </shape>
-    </item>
+            <!--<corners android:bottomLeftRadius="7dp" android:bottomRightRadius="7dp" android:topLeftRadius="7dp" android:topRightRadius="7dp" />-->
+        <!--</shape>-->
+    <!--</item>-->
 </selector>

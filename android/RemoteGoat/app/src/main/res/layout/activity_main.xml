@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -22,7 +22,9 @@
         android:id="@+id/instrument_image"
         android:layout_gravity="center_horizontal"
         android:layout_width="100dp"
-        android:layout_height="100dp" />
+        android:layout_height="100dp"
+        android:layout_below="@+id/instrument_name"
+        android:layout_centerHorizontal="true" />
     <Button
         android:visibility="visible"
         android:layout_width="fill_parent"
@@ -30,17 +32,23 @@
         android:id="@+id/recordButton"
         android:textColor="@android:color/white"
         android:background="@drawable/button_custom"
-        android:text="@string/recordButton"/>
+        android:text="@string/recordButton"
+        android:layout_below="@+id/instrument_image"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <ProgressBar
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:max="100"
         android:id="@+id/micSample"
         style="@android:style/Widget.ProgressBar.Horizontal"
-        />
+        android:layout_below="@+id/recordButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
-        android:visibility="invisible"
+        android:visibility="visible"
         android:enabled="false"
         android:textColor="@android:color/white"
         android:layout_width="fill_parent"
@@ -48,7 +56,18 @@
         android:background="@drawable/button_custom"
         android:id="@+id/sendButton"
         android:text="@string/sendButton"
-        />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/file_status"
+        android:paddingBottom="10dp"
+        android:layout_above="@+id/sendButton"
+        android:layout_centerHorizontal="true" />
 
 
-</LinearLayout>
+</RelativeLayout>

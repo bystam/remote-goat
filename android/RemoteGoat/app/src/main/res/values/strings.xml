@@ -6,4 +6,5 @@
     <string name="sendButton">Send audio</string>
     <string name="recordButton">Record</string>
     <string name="waiting">Waiting for instrument...</string>
+    <string name="file_ready">File ready for upload</string>
 </resources>

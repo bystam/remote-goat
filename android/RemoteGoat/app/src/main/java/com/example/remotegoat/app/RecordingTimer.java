@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -46,6 +47,8 @@ public class RecordingTimer {
         recorder.setAudioEncodingBitRate(16);
         recorder.setAudioSamplingRate(RECORDER_SAMPLERATE);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        recorder.setAudioChannels(1);
+        recorder.setAudioEncodingBitRate(44100 * 16);
         recorder.setOutputFile(outputFile);
         try {
             recorder.prepare();
@@ -94,6 +97,8 @@ public class RecordingTimer {
                 sendFileButton.setEnabled(true);
             } else {
                 animationUpdater.postDelayed(this, 100);
+                TextView fileStatus = (TextView) activity.findViewById(R.id.file_status);
+                fileStatus.setText(activity.getString(R.string.file_ready));
             }
         }
     }
