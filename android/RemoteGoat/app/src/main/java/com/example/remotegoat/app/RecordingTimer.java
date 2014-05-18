@@ -57,7 +57,6 @@ public class RecordingTimer {
     }
 
     public void startRecordingSession() throws Exception {
-        recordingStart = System.currentTimeMillis();
         timer.execute(new AudioRecorder());
 
         animationUpdater = new Handler();
