@@ -31,121 +31,91 @@ public:
 	}
 };
 
-class Sample
+Sample::Sample(RemoteGoatVstAudioProcessor* processor, const String& name)
+: _processor(processor),
+_name(name),
+_bufferIndex(0),
+_lastModification(0),
+_readyToSwap(false),
+_alive(false)
 {
-private:
-	RemoteGoatVstAudioProcessor* _processor;
-	String _name;
-	AudioSampleBuffer _buffers[2];
-	int _offsets[2];
-	int _bufferIndex;
-	Time _lastModification;
-	bool _readyToSwap;
-	bool _alive;
+	memset(_offsets, 0, sizeof(_offsets));
+}
 
-public:
-	const char* EXT = ".wav";
-	const char* WILDCARD = "*.wav";
+void Sample::update(const String& path, WavAudioFormat& wavAudioFormat)
+{
+	// Don't load a subsequent sample if a new sample is already loaded (but not yet played).
+	if (_readyToSwap)
+		return;
 
-	Sample()
+	// Find audio file.
+	String fileName(path);
+	fileName = File::addTrailingSeparator(fileName);
+	fileName += _name;
+	fileName += EXT;
+	File file(fileName);
+
+	Time modification = file.getLastModificationTime();
+	if (modification <= _lastModification)
+		return;
+	_lastModification = modification;
+
+	// Read audio file. We only read the left channel, mono is good enough.
+	AudioFormatReader* reader = wavAudioFormat.createReaderFor(file.createInputStream(), true);
+
+	int64 start = reader->searchForLevel(0, reader->lengthInSamples, SAMPLE_START_THRESHOLD, 1.0, 0);
+	if (start == -1)
+		start = 0;
+	int count = (int)(reader->lengthInSamples - start);
+
+	_processor->writeTrace(String() << "Loading " << _name << " from disk (skip=" << start << ")");
+
+	int newIndex = !_bufferIndex;
+	AudioSampleBuffer* buffer = &(_buffers[newIndex]);
+	buffer->setSize(1, count);
+
+	reader->read(buffer, 0, count, start, true, false);
+
+	delete reader;
+
+	// Done.
+	_readyToSwap = true;
+}
+
+void Sample::read(AudioSampleBuffer& output, int offset, int count, bool isNoteOn)
+{
+	if (isNoteOn)
 	{
-	}
-
-	Sample(RemoteGoatVstAudioProcessor* processor, const String& name)
-		: _processor(processor),
-		_name(name),
-		_bufferIndex(0),
-		_lastModification(0),
-		_readyToSwap(false),
-		_alive(false)
-	{
-		memset(_offsets, 0, sizeof(_offsets));
-	}
-
-	const String& getName() const
-	{
-		return _name;
-	}
-
-	// Read <path>/<_name><EXT> and store it in the backbuffer.
-	void update(const String& path, WavAudioFormat& wavAudioFormat)
-	{
-		// Don't load a subsequent sample if a new sample is already loaded (but not yet played).
+		_alive = true;
 		if (_readyToSwap)
-			return;
-
-		// Find audio file.
-		String fileName(path);
-		fileName = File::addTrailingSeparator(fileName);
-		fileName += _name;
-		fileName += EXT;
-		File file(fileName);
-
-		Time modification = file.getLastModificationTime();
-		if (modification <= _lastModification)
-			return;
-		_lastModification = modification;
-
-		// Read audio file. We only read the left channel, mono is good enough.
-		AudioFormatReader* reader = wavAudioFormat.createReaderFor(file.createInputStream(), true);
-
-		int64 start = reader->searchForLevel(0, reader->lengthInSamples, SAMPLE_START_THRESHOLD, 1.0, 0);
-		if (start == -1)
-			start = 0;
-		int count = (int)(reader->lengthInSamples - start);
-
-		_processor->writeTrace(String() << "Loading " << _name << " from disk (skip=" << start << ")");
-
-		int newIndex = !_bufferIndex;
-		AudioSampleBuffer* buffer = &(_buffers[newIndex]);
-		buffer->setSize(1, count);
-
-		reader->read(buffer, 0, count, start, true, false);
-
-		delete reader;
-
-		// Done.
-		_readyToSwap = true;
+			swap();
+		_offsets[_bufferIndex] = 0;
 	}
+	if (!_alive)
+		return;
+	AudioSampleBuffer* buffer = &(_buffers[_bufferIndex]);
+	if (buffer->getNumChannels() == 0)
+		return;
+	const float* data = buffer->getReadPointer(0);
+	data += _offsets[_bufferIndex];
+	count = std::min(count, (int)(buffer->getNumSamples() - _offsets[_bufferIndex]));
+	output.addFrom(0, offset, data, count);
+	output.addFrom(1, offset, data, count);
+	_offsets[_bufferIndex] += count;
+}
 
-	// Read <count> samples from frontbuffer into <output>.
-	// If a new note starts at offset, the sample will play from its start.
-	void read(AudioSampleBuffer& output, int offset, int count, bool isNoteOn)
-	{
-		if (isNoteOn)
-		{
-			_alive = true;
-			if (_readyToSwap)
-				swap();
-			_offsets[_bufferIndex] = 0;
-		}
-		if (!_alive)
-			return;
-		AudioSampleBuffer* buffer = &(_buffers[_bufferIndex]);
-		if (buffer->getNumChannels() == 0)
-			return;
-		const float* data = buffer->getReadPointer(0);
-		data += _offsets[_bufferIndex];
-		count = std::min(count, (int)(buffer->getNumSamples() - _offsets[_bufferIndex]));
-		output.addFrom(0, offset, data, count);
-		output.addFrom(1, offset, data, count);
-		_offsets[_bufferIndex] += count;
-	}
+void Sample::noteOff()
+{
+	_alive = false;
+	_offsets[_bufferIndex] = 0; // XXX: Race.
+}
 
-	void noteOff()
-	{
-		_alive = false;
-		_offsets[_bufferIndex] = 0; // XXX: Race.
-	}
-
-private:
-	void swap()
-	{
-		int newIndex = !_bufferIndex;
-		_bufferIndex = newIndex; // Swap buffers atomically.
-		_readyToSwap = false;
-	}
-};
+void Sample::swap()
+{
+	int newIndex = !_bufferIndex;
+	_bufferIndex = newIndex; // Swap buffers atomically.
+	_readyToSwap = false;
+}
 
 class FilesystemTimer : public juce::Timer
 {

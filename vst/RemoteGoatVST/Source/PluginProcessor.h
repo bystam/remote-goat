@@ -16,9 +16,45 @@
 #include <mutex>
 #include <map>
 
+class RemoteGoatVstAudioProcessor;
 class RepaintTimer;
-class Sample;
 class FilesystemTimer;
+
+class Sample
+{
+private:
+	RemoteGoatVstAudioProcessor* _processor;
+	String _name;
+	AudioSampleBuffer _buffers[2];
+	int _offsets[2];
+	int _bufferIndex;
+	Time _lastModification;
+	bool _readyToSwap;
+	bool _alive;
+
+public:
+	const char* EXT = ".wav";
+	const char* WILDCARD = "*.wav";
+
+	Sample() { }
+
+	Sample(RemoteGoatVstAudioProcessor* processor, const String& name);
+
+	const String& getName() const { return _name; }
+
+	// Read <path>/<_name><EXT> and store it in the backbuffer.
+	void update(const String& path, WavAudioFormat& wavAudioFormat);
+
+	// Read <count> samples from frontbuffer into <output>.
+	// If a new note starts at offset, the sample will play from its start.
+	void read(AudioSampleBuffer& output, int offset, int count, bool isNoteOn);
+
+	void noteOff();
+	bool isAlive() const { return _alive; }
+
+private:
+	void swap();
+};
 
 #define SAMPLE_NAMES_COUNT 11
 char* const SAMPLE_NAMES[SAMPLE_NAMES_COUNT] =

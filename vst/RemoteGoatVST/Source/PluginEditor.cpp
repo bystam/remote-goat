@@ -11,12 +11,15 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#define WIDTH 500
+#define HEIGHT 500
+
 //==============================================================================
 RemoteGoatVstAudioProcessorEditor::RemoteGoatVstAudioProcessorEditor(RemoteGoatVstAudioProcessor* ownerFilter)
 : AudioProcessorEditor(ownerFilter)
 {
 	// This is where our plugin's editor size is set.
-	setSize(400, 300);
+	setSize(WIDTH, HEIGHT);
 }
 
 RemoteGoatVstAudioProcessorEditor::~RemoteGoatVstAudioProcessorEditor()
@@ -26,21 +29,61 @@ RemoteGoatVstAudioProcessorEditor::~RemoteGoatVstAudioProcessorEditor()
 //==============================================================================
 void RemoteGoatVstAudioProcessorEditor::paint(Graphics& g)
 {
-	g.fillAll(Colours::white);
-	g.setColour(Colours::black);
+	g.fillAll(Colours::black);
+	g.setColour(Colours::white);
 	g.setFont(15.0f);
 
 	// Get audio processor.
 	auto* pu = getAudioProcessorTyped();
 
 	// Write trace lines.
-	const auto& trace = pu->getTrace();
-	int i = 0;
-	for (const String& line : trace)
+	if (0)
 	{
-		g.drawText(line, 0, i * 15, getWidth(), 15, Justification::left, true);
-		++i;
+		const auto& trace = pu->getTrace();
+		int i = 0;
+		for (const String& line : trace)
+		{
+			g.drawText(line, 0, i * 15, getWidth(), 15, Justification::left, true);
+			++i;
+		}
 	}
+
+	// Write note markers
+	int noteCount = SAMPLE_NAMES_COUNT;
+	const float twoPi = 2 * float_Pi;
+	const float thetaStart = float_Pi / 2;
+	float theta = thetaStart;
+	float dtheta = twoPi / noteCount;
+	const float radius = 175;
+	const float innerRadius = 75;
+	const float borderThickness = 3;
+	g.setFont(innerRadius / 2);
+	for (int i = 0; i < noteCount; ++i)
+	{
+		float cx = WIDTH / 2 + radius * cos(theta),
+			cy = HEIGHT / 2 + radius * sin(theta);
+		pu->writeTrace(String() << "Ellipse at " << cx << "," << cy);
+		Rectangle<float> rect(cx - innerRadius / 2, cy - innerRadius / 2,
+			innerRadius, innerRadius);
+		Colour colour((float)((theta - thetaStart) / twoPi), 1.0f, 1.0f, (uint8)0xFF);
+		g.setColour(colour);
+		g.drawEllipse(rect, borderThickness);
+		g.setColour(Colours::white);
+
+		const Sample& sample = pu->getSample(SAMPLE_NAMES[i]);
+		if (sample.isAlive())
+		{
+			g.setColour(colour);
+			g.fillEllipse(rect);
+			g.setColour(Colours::black);
+		}
+
+		Rectangle<int> recti(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+		g.drawFittedText(sample.getName(), recti, Justification::centred, 1);
+
+		theta += dtheta;
+	}
+
 }
 
 //==============================================================================
