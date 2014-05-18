@@ -29,7 +29,7 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
 
     public static String instrumentColor;
 
-    public GetInstrumentTask(MainActivity activity) {
+    public GetInstrumentTask(Activity activity) {
         this.activity = activity;
     }
 
@@ -87,5 +87,11 @@ public class GetInstrumentTask extends AsyncTask<String, Void, String> {
         instrumentTitle.setText(name);
         View mainView = activity.getWindow().getDecorView();
         mainView.setBackgroundColor(Color.parseColor(colorHex));
+        instrumentImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new GetInstrumentTask(activity).execute();
+            }
+        });
     }
 }
