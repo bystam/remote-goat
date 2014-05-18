@@ -110,6 +110,16 @@ void Sample::noteOff()
 	_offsets[_bufferIndex] = 0; // XXX: Race.
 }
 
+int64 Sample::getMsecSinceLoad() const
+{
+	return (Time::currentTimeMillis() - _lastModification.currentTimeMillis());
+}
+
+int64 Sample::getMsecSinceNoteOn() const
+{
+	return 0;
+}
+
 void Sample::swap()
 {
 	int newIndex = !_bufferIndex;

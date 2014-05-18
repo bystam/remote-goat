@@ -31,6 +31,8 @@ public:
 	//==============================================================================
 protected:
 	RemoteGoatVstAudioProcessor* getAudioProcessorTyped() const;
+
+	Image _goat;
 };
 
 

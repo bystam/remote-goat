@@ -51,6 +51,8 @@ public:
 
 	void noteOff();
 	bool isAlive() const { return _alive; }
+	int64 getMsecSinceLoad() const;
+	int64 getMsecSinceNoteOn() const;
 
 private:
 	void swap();
@@ -58,7 +60,7 @@ private:
 
 #define SAMPLE_NAMES_COUNT 11
 char* const SAMPLE_NAMES[SAMPLE_NAMES_COUNT] =
-{ "BD", "SD", "LT", "MT", "HT", "RS", "CP", "CB", "CI", "OH", "CH" };
+{ "BD", "SD", "LT", "MT", "HT", "RS", "CP", "CB", "CY", "OH", "CH" };
 
 #define SAMPLE_START_THRESHOLD 0.1
 

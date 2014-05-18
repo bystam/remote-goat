@@ -20,6 +20,8 @@ RemoteGoatVstAudioProcessorEditor::RemoteGoatVstAudioProcessorEditor(RemoteGoatV
 {
 	// This is where our plugin's editor size is set.
 	setSize(WIDTH, HEIGHT);
+
+	_goat = ImageFileFormat::loadFrom(BinaryData::goat_png, BinaryData::goat_pngSize);
 }
 
 RemoteGoatVstAudioProcessorEditor::~RemoteGoatVstAudioProcessorEditor()
@@ -29,12 +31,15 @@ RemoteGoatVstAudioProcessorEditor::~RemoteGoatVstAudioProcessorEditor()
 //==============================================================================
 void RemoteGoatVstAudioProcessorEditor::paint(Graphics& g)
 {
-	g.fillAll(Colours::black);
+	g.fillAll(Colour(0x20, 0x20, 0x20));
 	g.setColour(Colours::white);
 	g.setFont(15.0f);
 
 	// Get audio processor.
 	auto* pu = getAudioProcessorTyped();
+
+	// Write logo.
+	g.drawImage(_goat, WIDTH / 2 - 110, HEIGHT / 2 - 110, 220, 220, 0, 0, 220, 220);
 
 	// Write trace lines.
 	if (0)
@@ -51,10 +56,10 @@ void RemoteGoatVstAudioProcessorEditor::paint(Graphics& g)
 	// Write note markers
 	int noteCount = SAMPLE_NAMES_COUNT;
 	const float twoPi = 2 * float_Pi;
-	const float thetaStart = float_Pi / 2;
+	const float thetaStart = 3 * float_Pi / 2;
 	float theta = thetaStart;
 	float dtheta = twoPi / noteCount;
-	const float radius = 175;
+	const float radius = 200;
 	const float innerRadius = 75;
 	const float borderThickness = 3;
 	g.setFont(innerRadius / 2);
