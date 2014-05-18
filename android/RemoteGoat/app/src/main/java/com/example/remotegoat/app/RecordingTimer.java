@@ -1,7 +1,6 @@
 package com.example.remotegoat.app;
 
 import android.app.Activity;
-import android.media.AudioFormat;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
@@ -20,18 +19,15 @@ import java.util.concurrent.TimeUnit;
 public class RecordingTimer {
 
     private static final int RECORDER_SAMPLERATE =  44100;
-    private static final int BUFFER_SIZE = 1792 * 2;
-    private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
-    private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 
-    private final int SESSION_MILLISECONDS = 2000;
 
+    private final int TIMER_INTERVAL = 700;
+    private final int PRE_RECORD = 300;
 
     private LinearLayout recordingProgress;
     private ScheduledThreadPoolExecutor timer;
     private Handler animationUpdater;
-    private long recordingStart;
     private Activity activity;
 
 
@@ -82,7 +78,7 @@ public class RecordingTimer {
         private void record() throws IOException, InterruptedException {
             MediaRecorder mediaRecorder = getMediaRecorder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+"recording.mp4");
             mediaRecorder.start();
-            Thread.sleep(SESSION_MILLISECONDS);
+            Thread.sleep(TIMER_INTERVAL + PRE_RECORD);
             mediaRecorder.stop();
             mediaRecorder.release();
         }
@@ -98,7 +94,7 @@ public class RecordingTimer {
                 writeProgress(progress);
             if(progress == 3){
                 ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
-                executor.schedule(new AudioRecorder(), 700, TimeUnit.MILLISECONDS);
+                executor.schedule(new AudioRecorder(), TIMER_INTERVAL-PRE_RECORD, TimeUnit.MILLISECONDS);
             }
             if(progress == 4){
                 TextView fileStatus = (TextView) activity.findViewById(R.id.file_status);
@@ -111,7 +107,7 @@ public class RecordingTimer {
                 TextView fileStatus = (TextView) activity.findViewById(R.id.file_status);
                 fileStatus.setText(activity.getString(R.string.file_ready));
             } else{
-                animationUpdater.postDelayed(this, 1000);
+                animationUpdater.postDelayed(this, TIMER_INTERVAL);
             }
         }
     }
@@ -126,10 +122,6 @@ public class RecordingTimer {
         for (int i = 0; i < progress ; i++) {
             recordingProgress.getChildAt(i).setVisibility(View.VISIBLE);
         }
-    }
-
-    private boolean runningSession (){
-        return System.currentTimeMillis() - recordingStart < SESSION_MILLISECONDS;
     }
 
 
