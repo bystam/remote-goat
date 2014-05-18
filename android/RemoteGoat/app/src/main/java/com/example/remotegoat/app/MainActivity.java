@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final String hostname = "192.168.43.218";
+        final String hostname = "10.48.12.80";
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle("IP?");
