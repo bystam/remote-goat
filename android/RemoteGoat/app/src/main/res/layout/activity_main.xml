@@ -38,11 +38,6 @@
         android:id="@+id/micSample"
         style="@android:style/Widget.ProgressBar.Horizontal"
         />
-    <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="250dp"
-        android:src="@drawable/ic_launcher"/>
 
     <Button
         android:visibility="invisible"

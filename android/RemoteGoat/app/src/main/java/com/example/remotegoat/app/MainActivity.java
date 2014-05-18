@@ -8,24 +8,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-    private MicrophoneSampleView micSampleView;
-    private FilesystemRecorder filesystemRecorder = new FilesystemRecorder();
     public static String instrumentId;
+    ProgressBar micSampleOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         new GetInstrumentTask(this).execute();
-        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
-        ProgressBar micSampleOutput =  (ProgressBar) findViewById(R.id.micSample);
-        micSampleView = new MicrophoneSampleView(micSampleOutput);
+        micSampleOutput =  (ProgressBar) findViewById(R.id.micSample);
         Typeface font = Typeface.createFromAsset(getAssets(), "8-BIT WONDER.TTF");
         TextView instrumentTitle = (TextView) findViewById(R.id.instrument_name);
         instrumentTitle.setTypeface(font);
@@ -57,7 +53,7 @@ public class MainActivity extends Activity {
     private void startRecording (){
         Log.d("STARTING", "starting recording sesh");
         try {
-            new RecordingTimer(micSampleView, filesystemRecorder, this).startRecordingSession();
+            new RecordingTimer(micSampleOutput, this).startRecordingSession();
         } catch (Exception e) {
             e.printStackTrace();
         }

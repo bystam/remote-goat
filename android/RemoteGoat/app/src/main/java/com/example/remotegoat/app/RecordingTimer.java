@@ -2,11 +2,11 @@ package com.example.remotegoat.app;
 
 import android.app.Activity;
 import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -22,44 +22,28 @@ public class RecordingTimer {
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 
-    final int RECORDING_TIME = 1000; //ms
-
-    private final int SESSION_MILLISECONDS = 5000;
-    private final int ANIMATION_INTERVAL = 100;
-    private final int RECORDING_DELAY = SESSION_MILLISECONDS - RECORDING_TIME;
+    private final int SESSION_MILLISECONDS = 2000;
 
 
-    private AudioRecord recorder;
-    private MicrophoneSampleView microphoneSampleView;
-    private FilesystemRecorder filesystemRecorder;
+    private ProgressBar recordingProgress;
     private ScheduledThreadPoolExecutor timer;
     private Handler animationUpdater;
-    private long animationStart;
-
-    private int currentAmplitude;
+    private long recordingStart;
     private Activity activity;
 
 
-    public RecordingTimer(MicrophoneSampleView micSampleView, FilesystemRecorder filesystemRecorder,
+    public RecordingTimer(ProgressBar progress,
                           Activity activity){
         this.activity = activity;
         timer = new ScheduledThreadPoolExecutor(2);
-        this.recorder = getAudioRecorder();
-        this.filesystemRecorder = filesystemRecorder;
-        this.microphoneSampleView = micSampleView;
-    }
-
-    private AudioRecord getAudioRecorder(){
-        AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                RECORDER_SAMPLERATE, RECORDER_CHANNELS,
-                RECORDER_AUDIO_ENCODING, BUFFER_SIZE);
-        return recorder;
+        this.recordingProgress = progress;
     }
 
     private MediaRecorder getMediaRecorder (String outputFile){
         MediaRecorder recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        recorder.setAudioEncodingBitRate(16);
         recorder.setAudioSamplingRate(RECORDER_SAMPLERATE);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         recorder.setOutputFile(outputFile);
@@ -72,8 +56,9 @@ public class RecordingTimer {
     }
 
     public void startRecordingSession() throws Exception {
-        animationStart = System.currentTimeMillis();
-        microphoneSampleView.startAnimation();
+        recordingStart = System.currentTimeMillis();
+        timer.execute(new AudioRecorder());
+
         animationUpdater = new Handler();
         animationUpdater.post(new IntervalAnimationUpdate());
     }
@@ -92,45 +77,29 @@ public class RecordingTimer {
         private void record() throws IOException, InterruptedException {
             MediaRecorder mediaRecorder = getMediaRecorder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+"recording.mp4");
             mediaRecorder.start();
-            Thread.sleep(RECORDING_TIME);
+            Thread.sleep(SESSION_MILLISECONDS);
             mediaRecorder.stop();
             mediaRecorder.release();
         }
     }
 
     private class IntervalAnimationUpdate implements Runnable {
-        private boolean recorded = false;
 
         @Override
         public void run() {
-            microphoneSampleView.updateAnimation(2);
-
-            if(runningSession())
-                animationUpdater.postDelayed(this, ANIMATION_INTERVAL);
-            if(startRecording() && !recorded) {
-                timer.execute(new AudioRecorder());
-                recorded = true;
-                microphoneSampleView.startRecordingPhase();
-            }
+            recordingProgress.incrementProgressBy(5);
             if(!runningSession()){
-                microphoneSampleView.stopAnimation();
+                recordingProgress.setProgress(0);
                 Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
                 sendFileButton.setEnabled(true);
+            } else {
+                animationUpdater.postDelayed(this, 100);
             }
         }
     }
 
-    private boolean startRecording(){
-        long timePassed = System.currentTimeMillis() - animationStart;
-        return timePassed > RECORDING_DELAY;
-    }
-
     private boolean runningSession (){
-        return System.currentTimeMillis() - animationStart < SESSION_MILLISECONDS;
-    }
-
-    private boolean preRecordingPhase() {
-        return System.currentTimeMillis() - animationStart < RECORDING_DELAY;
+        return System.currentTimeMillis() - recordingStart < SESSION_MILLISECONDS;
     }
 
 
