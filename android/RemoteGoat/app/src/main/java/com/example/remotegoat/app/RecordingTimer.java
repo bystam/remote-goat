@@ -7,6 +7,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -116,6 +117,8 @@ public class RecordingTimer {
                 microphoneSampleView.stopAnimation();
                 Button sendFileButton = (Button) activity.findViewById(R.id.sendButton);
                 sendFileButton.setEnabled(true);
+                TextView fileStatus = (TextView) activity.findViewById(R.id.file_status);
+                fileStatus.setText("File ready for upload!");
             }
         }
     }
