@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-    public static String instrumentId;
     ProgressBar micSampleOutput;
 
     @Override
@@ -48,6 +46,7 @@ public class MainActivity extends Activity {
         sendFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("Send button", "clicked");
                 new PostSoundFileTask(MainActivity.this).execute();
             }
         });

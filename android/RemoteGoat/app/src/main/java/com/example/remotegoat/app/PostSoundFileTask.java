@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class PostSoundFileTask extends AsyncTask<String, Void, String> {
 
-    private final String hostname = "http://192.168.43.218/";
+    private final String hostname = "http://192.168.43.6/";
     private Activity activity;
 
     public PostSoundFileTask(Activity activity) {
@@ -35,6 +35,7 @@ public class PostSoundFileTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
+        Log.d("Post", "Executed");
         String url = hostname + "sample";
         return post(url);
     }
@@ -55,9 +56,7 @@ public class PostSoundFileTask extends AsyncTask<String, Void, String> {
         // the file to be posted
         String filePath = Environment.getExternalStorageDirectory() + "/recording.mp4";
 
-        Log.d("file path", filePath);
         // the URL where the file will be posted
-
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "Custom user agent");
         HttpPost httpPost = new HttpPost(url);
@@ -82,7 +81,9 @@ public class PostSoundFileTask extends AsyncTask<String, Void, String> {
         // execute HTTP post request
         HttpResponse response = null;
         try {
+            Log.d("Before client execute", "yup");
             response = httpClient.execute(httpPost);
+            Log.d("After client execute", "jodu");
         } catch (IOException e) {
             e.printStackTrace();
         }
