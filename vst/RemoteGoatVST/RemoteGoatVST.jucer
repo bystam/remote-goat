@@ -11,6 +11,7 @@
               aaxIdentifier="com.yourcompany.RemoteGoatVST" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
               jucerVersion="3.1.0">
   <MAINGROUP id="V7SwRi" name="RemoteGoatVST">
+    <FILE id="tU44E2" name="goat.png" compile="0" resource="1" file="goat.png"/>
     <GROUP id="{894A872A-63B1-0980-FADB-A73EE7E5C32D}" name="Source">
       <FILE id="tV96ls" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

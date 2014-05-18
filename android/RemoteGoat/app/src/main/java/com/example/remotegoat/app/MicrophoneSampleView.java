@@ -1,21 +1,27 @@
 package com.example.remotegoat.app;
 
-import android.content.Context;
-import android.media.MediaRecorder;
-import android.view.View;
+import android.graphics.Color;
+import android.widget.ProgressBar;
 
 /**
  * Created by jensa on 17/05/2014.
  */
-public class MicrophoneSampleView extends View {
-    MediaRecorder recorder;
+public class MicrophoneSampleView {
+    ProgressBar view;
 
-    public MicrophoneSampleView(Context context, MediaRecorder recorder) {
-        super(context);
-        this.recorder = recorder;
+    //Constructor that is called when inflating a view from XML.
+    public MicrophoneSampleView(ProgressBar output){
+        view = output;
+        view.getProgressDrawable().setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
-    public void startRecording (){
-
+    public void updateAnimation(int increment){
+        view.incrementProgressBy(increment);
     }
+
+    public void stopAnimation(){
+        view.setProgress(0);
+    }
+
 }
+

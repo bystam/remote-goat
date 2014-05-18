@@ -31,114 +31,122 @@ public:
 	}
 };
 
-class Sample
+Sample::Sample(RemoteGoatVstAudioProcessor* processor, const String& name)
+: _processor(processor),
+_name(name),
+_bufferIndex(0),
+_lastModification(0),
+_readyToSwap(false),
+_alive(false)
 {
-private:
-	RemoteGoatVstAudioProcessor* _processor;
-	String _name;
-	AudioSampleBuffer _buffers[2];
-	int _offsets[2];
-	int _bufferIndex;
-	Time _lastModification;
-	bool _readyToSwap;
+	memset(_offsets, 0, sizeof(_offsets));
+}
 
-public:
-	const char* EXT = ".wav";
-	const char* WILDCARD = "*.wav";
+void Sample::update(const String& path, WavAudioFormat& wavAudioFormat)
+{
+	// Don't load a subsequent sample if a new sample is already loaded (but not yet played).
+	if (_readyToSwap)
+		return;
 
-	Sample()
+	// Find audio file.
+	String fileName(path);
+	fileName = File::addTrailingSeparator(fileName);
+	fileName += _name;
+	fileName += EXT;
+	File file(fileName);
+
+	Time modification = file.getLastModificationTime();
+	if (modification <= _lastModification)
+		return;
+	_lastModification = modification;
+
+	// Read audio file. We only read the left channel, mono is good enough.
+	AudioFormatReader* reader = wavAudioFormat.createReaderFor(file.createInputStream(), true);
+
+	int64 start = reader->searchForLevel(0, reader->lengthInSamples, SAMPLE_START_THRESHOLD, 1.0, 0);
+	if (start == -1)
+		start = 0;
+	int count = (int)(reader->lengthInSamples - start);
+
+	_processor->writeTrace(String() << "Loading " << _name << " from disk (skip=" << start << ")");
+
+	int newIndex = !_bufferIndex;
+	AudioSampleBuffer* buffer = &(_buffers[newIndex]);
+	buffer->setSize(1, count);
+
+	reader->read(buffer, 0, count, start, true, false);
+
+	delete reader;
+
+	// Done.
+	_readyToSwap = true;
+}
+
+void Sample::read(AudioSampleBuffer& output, int offset, int count, bool isNoteOn)
+{
+	if (isNoteOn)
 	{
-	}
-
-	Sample(RemoteGoatVstAudioProcessor* processor, const String& name)
-		: _processor(processor),
-		_name(name),
-		_bufferIndex(0),
-		_lastModification(0)
-	{
-		memset(_offsets, 0, sizeof(_offsets));
-	}
-
-	const String& getName() const
-	{
-		return _name;
-	}
-
-	// Read <path>/<_name><EXT> and store it in the backbuffer.
-	void update(const String& path, WavAudioFormat& wavAudioFormat)
-	{
-		// Don't load a subsequent sample if a new sample is already loaded (but not yet played).
+		_alive = true;
 		if (_readyToSwap)
-			return;
-
-		// Find audio file.
-		String fileName(path);
-		fileName = File::addTrailingSeparator(fileName);
-		fileName += _name;
-		fileName += EXT;
-		File file(fileName);
-
-		Time modification = file.getLastModificationTime();
-		if (modification <= _lastModification)
-			return;
-		_lastModification = modification;
-		_processor->writeTrace(String() << "Updating " << _name);
-
-		// Read audio file. We only read the left channel, mono is good enough.
-		FileInputStream* stream = file.createInputStream();
-		AudioFormatReader* reader = wavAudioFormat.createReaderFor(stream, true);
-		int newIndex = !_bufferIndex;
-		AudioSampleBuffer* buffer = &(_buffers[newIndex]);
-		buffer->setSize(1, reader->lengthInSamples);
-		reader->read(buffer, 0, (int)reader->lengthInSamples, 0, true, false);
-
-		// Done.
-		_readyToSwap = true;
+			swap();
+		_offsets[_bufferIndex] = 0;
 	}
+	if (!_alive)
+		return;
+	AudioSampleBuffer* buffer = &(_buffers[_bufferIndex]);
+	if (buffer->getNumChannels() == 0)
+		return;
+	const float* data = buffer->getReadPointer(0);
+	data += _offsets[_bufferIndex];
+	count = std::min(count, (int)(buffer->getNumSamples() - _offsets[_bufferIndex]));
+	output.addFrom(0, offset, data, count);
+	output.addFrom(1, offset, data, count);
+	_offsets[_bufferIndex] += count;
+}
 
-	// Read <n> samples from frontbuffer into <buffer>.
-	void read(AudioSampleBuffer& output, int offset, int count, bool isNoteOn)
-	{
-		if (isNoteOn)
-		{
-			if (_readyToSwap)
-				swap();
-			_offsets[_bufferIndex] = 0;
-		}
-		AudioSampleBuffer* buffer = &(_buffers[_bufferIndex]);
-		if (buffer->getNumChannels() == 0)
-			return;
-		const float* data = buffer->getReadPointer(0);
-		data += _offsets[_bufferIndex];
-		count = std::min(count, (int)(buffer->getNumSamples() - _offsets[_bufferIndex]));
-		output.addFrom(0, offset, data, count);
-		output.addFrom(1, offset, data, count);
-		_offsets[_bufferIndex] += count;
-	}
+void Sample::noteOff()
+{
+	_alive = false;
+	_offsets[_bufferIndex] = 0; // XXX: Race.
+}
 
-private:
-	void swap()
-	{
-		int newIndex = !_bufferIndex;
-		_bufferIndex = newIndex; // Swap buffers atomically.
-		_readyToSwap = false;
-	}
-};
+int64 Sample::getMsecSinceLoad() const
+{
+	return (Time::currentTimeMillis() - _lastModification.toMilliseconds());
+}
+
+int64 Sample::getMsecSinceNoteOn() const
+{
+	return 0;
+}
+
+void Sample::swap()
+{
+	int newIndex = !_bufferIndex;
+	_bufferIndex = newIndex; // Swap buffers atomically.
+	_readyToSwap = false;
+}
 
 class FilesystemTimer : public juce::Timer
 {
 private:
 	RemoteGoatVstAudioProcessor* _processor;
 	int _period;
-	WavAudioFormat _wavAudioFormat;
+	WavAudioFormat* _wavAudioFormat;
 
 public:
 	FilesystemTimer(RemoteGoatVstAudioProcessor* processor) :
 		_processor(processor),
 		_period(200),
-		_wavAudioFormat()
+		_wavAudioFormat(new WavAudioFormat)
 	{
 		this->startTimer(_period);
+	}
+
+	~FilesystemTimer()
+	{
+		if (_wavAudioFormat != nullptr)
+			delete _wavAudioFormat;
 	}
 
 	virtual void timerCallback()
@@ -153,7 +161,7 @@ public:
 
 		for (const String& sampleName : SAMPLE_NAMES)
 		{
-			_processor->getSample(sampleName).update(path, _wavAudioFormat);
+			_processor->getSample(sampleName).update(path, *_wavAudioFormat);
 		}
 
 		this->startTimer(_period);
@@ -181,6 +189,7 @@ RemoteGoatVstAudioProcessor::RemoteGoatVstAudioProcessor()
 RemoteGoatVstAudioProcessor::~RemoteGoatVstAudioProcessor()
 {
 	delete _repaintTimer;
+	delete _filesystemTimer;
 }
 
 //==============================================================================
@@ -299,37 +308,38 @@ void RemoteGoatVstAudioProcessor::releaseResources()
 
 void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-	if (!midiMessages.isEmpty())
-	{
-		String trace;
-		trace << "MIDI:";
-		for (int i = 0; i < midiMessages.data.size(); ++i)
-		{
-			trace << String::formatted(" %02X", midiMessages.data[i]);
-		}
-		writeTrace(trace);
-	}
+	//if (!midiMessages.isEmpty())
+	//{
+	//	String trace;
+	//	trace << "MIDI:";
+	//	for (int i = 0; i < midiMessages.data.size(); ++i)
+	//	{
+	//		trace << String::formatted(" %02X", midiMessages.data[i]);
+	//	}
+	//	writeTrace(trace);
+	//}
 
 	// For each sample name,
 	// a sorted collection of "note on" event sample positions.
-	std::map<String, std::set<int>> noteOnSets;
+	std::map<String, std::set<std::pair<int, bool>>> noteOnSets;
 
 	MidiBuffer::Iterator it(midiMessages);
 	MidiMessage midiMessage;
 	int samplePosition;
 	while (it.getNextEvent(midiMessage, samplePosition))
 	{
-		if (midiMessage.isNoteOn())
+		// Check note number, map to sample name.
+		int note = midiMessage.getNoteNumber();
+		auto itt = _noteNumberSampleNameMap.find(note);
+		if (itt != _noteNumberSampleNameMap.end())
 		{
-			// Check note number, map to sample name.
-			// Save note on sample position for sample.
-			int note = midiMessage.getNoteNumber();
-			auto itt = _noteNumberSampleNameMap.find(note);
-			if (itt != _noteNumberSampleNameMap.end())
-			{
-				String sampleName = itt->second;
-				noteOnSets[sampleName].insert(samplePosition);
-			}
+			String sampleName = itt->second;
+
+			if (midiMessage.isNoteOn())
+				// Save note on sample position for sample.
+				noteOnSets[sampleName].insert(std::make_pair(samplePosition, true));
+			else if (midiMessage.isNoteOff())
+				noteOnSets[sampleName].insert(std::make_pair(samplePosition, false));
 		}
 	}
 
@@ -341,27 +351,35 @@ void RemoteGoatVstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBu
 	for (auto& samplePair : _samples)
 	{
 		Sample& sample = samplePair.second;
-		auto it = noteOnSets.find(sample.getName());
-		if (it != noteOnSets.end())
+		auto noteOnSetsIterator = noteOnSets.find(sample.getName());
+		if (noteOnSetsIterator != noteOnSets.end())
 		{
-			std::set<int>& noteOns = it->second;
-			int offset = *noteOns.begin();
+			const std::set<std::pair<int, bool>>& noteOns = noteOnSetsIterator->second;
+			int offset = noteOns.begin()->first;
 			sample.read(buffer, 0, offset, false);
-			for (auto itt = noteOns.begin(); itt != noteOns.end(); ++itt)
+			for (auto noteOnIterator = noteOns.begin(); noteOnIterator != noteOns.end(); ++noteOnIterator)
 			{
-				int noteOn = *itt;
-				auto ittt = itt;
-				++ittt;
-				if (ittt != noteOns.end())
+				int noteOn = noteOnIterator->first;
+				bool onOrOff = noteOnIterator->second;
+				writeTrace(String() << "Triggered " << sample.getName() + " (" << (int)onOrOff << ")");
+				auto nextNoteOnIterator = noteOnIterator;
+				++nextNoteOnIterator;
+				if (nextNoteOnIterator != noteOns.end())
 				{
-					int noteOnNext = *ittt;
-					int diff = noteOnNext - noteOn;
-					sample.read(buffer, offset, diff, true);
+					int nextNoteOn = nextNoteOnIterator->first;
+					int diff = nextNoteOn - noteOn;
+					if (onOrOff)
+						sample.read(buffer, offset, diff, true);
+					else
+						sample.noteOff();
 					offset += diff;
 				}
 				else
 				{
-					sample.read(buffer, offset, buffer.getNumSamples() - offset, true);
+					if (onOrOff)
+						sample.read(buffer, offset, buffer.getNumSamples() - offset, true);
+					else
+						sample.noteOff();
 				}
 			}
 		}
