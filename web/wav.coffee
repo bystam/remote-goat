@@ -11,15 +11,15 @@ exports.convertToWav = (oldPath, callback) ->
 
   console.log command
   exec command, (err) ->
-  	if err?
-  		return console.log JSON.stringify(err)
+    if err?
+      return callback err
 
-  	goatDir = getGoatDir()
-  	newPath = path.resolve goatDir, (base + '.wav')
-  	command = "sox #{wavPath} #{newPath} silence 1 0.1 10%"
-  	console.log command
-  	exec command, callback
-  	
+    goatDir = getGoatDir()
+    newPath = path.resolve goatDir, (base + '.wav')
+    command = "sox #{wavPath} #{newPath} silence 1 0.1 10%"
+    console.log command
+    exec command, callback
+    
 
 
 getGoatDir = () ->
