@@ -22,11 +22,12 @@ public class RecordingTimer {
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 
+    final int RECORDING_TIME = 1000; //ms
+
     private final int SESSION_MILLISECONDS = 5000;
     private final int ANIMATION_INTERVAL = 100;
-    private final int RECORDING_DELAY = 4500;
+    private final int RECORDING_DELAY = SESSION_MILLISECONDS - RECORDING_TIME;
 
-    final int RECORDING_TIME = 500; //ms
 
     private AudioRecord recorder;
     private MicrophoneSampleView microphoneSampleView;
@@ -98,19 +99,18 @@ public class RecordingTimer {
     }
 
     private class IntervalAnimationUpdate implements Runnable {
-        private int progress = 0;
         private boolean recorded = false;
 
         @Override
         public void run() {
             microphoneSampleView.updateAnimation(2);
-            progress += 2;
-            if(progress> 90);
+
             if(runningSession())
                 animationUpdater.postDelayed(this, ANIMATION_INTERVAL);
             if(startRecording() && !recorded) {
                 timer.execute(new AudioRecorder());
                 recorded = true;
+                microphoneSampleView.startRecordingPhase();
             }
             if(!runningSession()){
                 microphoneSampleView.stopAnimation();

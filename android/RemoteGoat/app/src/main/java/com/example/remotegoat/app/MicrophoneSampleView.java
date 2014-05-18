@@ -1,5 +1,6 @@
 package com.example.remotegoat.app;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.widget.ProgressBar;
 
@@ -15,6 +16,7 @@ public class MicrophoneSampleView {
     //Constructor that is called when inflating a view from XML.
     public MicrophoneSampleView(ProgressBar output){
         view = output;
+        view.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
     public void startAnimation(){
@@ -26,8 +28,14 @@ public class MicrophoneSampleView {
         view.incrementProgressBy(amplitude);
     }
 
+
+    public void startRecordingPhase (){
+        view.getProgressDrawable().setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.MULTIPLY);
+    }
+
     public void stopAnimation(){
         view.setProgress(0);
+        view.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
 //    @Override

@@ -33,11 +33,16 @@
         android:text="@string/recordButton"/>
     <ProgressBar
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:max="100"
         android:id="@+id/micSample"
         style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_marginRight="5dp" />
+        />
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="250dp"
+        android:src="@drawable/ic_launcher"/>
 
     <Button
         android:visibility="invisible"
