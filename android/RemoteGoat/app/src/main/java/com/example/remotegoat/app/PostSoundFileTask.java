@@ -15,6 +15,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.File;
@@ -58,6 +59,7 @@ public class PostSoundFileTask extends AsyncTask<String, Void, String> {
 
         // the URL where the file will be posted
         HttpClient httpClient = new DefaultHttpClient();
+        HttpConnectionParams.setSoTimeout(httpClient.getParams(), 3000);
         httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "Custom user agent");
         HttpPost httpPost = new HttpPost(url);
 
