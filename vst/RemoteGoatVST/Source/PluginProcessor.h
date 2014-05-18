@@ -24,6 +24,8 @@ class FilesystemTimer;
 char* const SAMPLE_NAMES[SAMPLE_NAMES_COUNT] =
 { "BD", "CB", "CH", "CP", "CY", "HT", "LT", "MT", "OH", "RS", "SD" };
 
+#define SAMPLE_START_THRESHOLD 0.1
+
 //==============================================================================
 /**
 */

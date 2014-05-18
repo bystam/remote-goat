@@ -85,15 +85,23 @@ public:
 		if (modification <= _lastModification)
 			return;
 		_lastModification = modification;
-		_processor->writeTrace(String() << "Loading " << _name << " from disk");
 
 		// Read audio file. We only read the left channel, mono is good enough.
-		FileInputStream* stream = file.createInputStream();
-		AudioFormatReader* reader = wavAudioFormat.createReaderFor(stream, true);
+		AudioFormatReader* reader = wavAudioFormat.createReaderFor(file.createInputStream(), true);
+
+		int64 start = reader->searchForLevel(0, reader->lengthInSamples, SAMPLE_START_THRESHOLD, 1.0, 0);
+		if (start == -1)
+			start = 0;
+		int count = (int)(reader->lengthInSamples - start);
+
+		_processor->writeTrace(String() << "Loading " << _name << " from disk (skip=" << start << ")");
+
 		int newIndex = !_bufferIndex;
 		AudioSampleBuffer* buffer = &(_buffers[newIndex]);
-		buffer->setSize(1, reader->lengthInSamples);
-		reader->read(buffer, 0, (int)reader->lengthInSamples, 0, true, false);
+		buffer->setSize(1, count);
+
+		reader->read(buffer, 0, count, start, true, false);
+
 		delete reader;
 
 		// Done.
