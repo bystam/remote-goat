@@ -52,7 +52,6 @@ public class MainActivity extends Activity {
 
 
     private void startRecording (){
-        Log.d("STARTING", "starting recording sesh");
         try {
             new RecordingTimer(progressLayout, this).startRecordingSession();
         } catch (Exception e) {
