@@ -11,6 +11,15 @@ Audio samples are recorded in the Android app, sent to the web server, stored in
 
 ### Web
 
+1. Install node.js (http://nodejs.org/)
+2. using npm, install coffee-script globally (npm install -g coffee-script)
+3. install ffmpeg (http://www.ffmpeg.org/ or brew install ffmpeg)
+4. install sox (http://sox.sourceforge.net/ or brew install sox)
+5. ensure ffmpeg and sox is in your path
+3. Navigate to remote-goat/web
+4. start server (npm start)
+5. uploaded sound files from the android app will be stored in HOME/.remote-goat
+
 ### VST
 
 1. Install VST Audio Plug-Ins SDK (http://www.steinberg.net/en/company/developer.html)
