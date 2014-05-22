@@ -26,5 +26,6 @@ Audio samples are recorded in the Android app, sent to the web server, stored in
 2. Install JUCE (http://www.juce.com)
 3. Build the Introjucer (JUCE extras folder)
 4. Run the Introjucer and open the RemoteGoatVST project
-5. Build the VST using your preferred build system
+5. Find your preferred build system in the Introjucer GUI (right click to add new)
+5. Set VST Folder path, then "Save Project and Open in ..." and build the VST
 6. Get RemoteGoatVST.dll from the Builds folder and load it into a DAW of your choice
